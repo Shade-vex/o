@@ -79,3 +79,35 @@ ActivateAntiCheatBypass()
 
 local DiscordTab = Window:CreateTab("🌐Discord", nil) -- Code tạo tab , viết tên tab + emoji đều được
 local DiscordSection = DiscordTab:CreateSection("Discord")
+ForceLoadTab()
+
+
+
+local CopyButton = DiscordTab:CreateButton({
+   Name = "Tham gia Discord",
+   Callback = function()
+        setclipboard("https://discord.gg/yourlinkhere") -- Thay bằng link Discord của bạn
+        Rayfield:Notify({
+            Title = "Thông báo",
+            Content = "Đã sao chép link Discord !",
+            Duration = 3,
+            Image = 125562543157030, -- Có thể đổi ảnh thông báo nếu muốn
+            Actions = {
+                Ignore = {
+                    Name = "OK!",
+                    Callback = function()
+                        print("Người dùng đã bấm OK")
+                    end
+                }
+            }
+        })
+   end,
+})
+
+local DiscordSection = DiscordTab:CreateSection("Các chức năng:")
+local DiscordSection = DiscordTab:CreateSection("- Vô hiệu Anti-cheat ✅")
+
+
+local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết tên tab + emoji đều được
+local ScriptSection = ScriptTab:CreateSection("Script")
+ForceLoadTab()
