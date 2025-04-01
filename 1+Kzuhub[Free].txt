@@ -1,0 +1,156 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🔰 Kzu Hub [Free] | Game 🔰", -- Tên hub của bạn trong menu
+   LoadingTitle = "🔰 Kzu hub [Free] 🔰", -- Tên hub của bạn trong khi load
+   LoadingSubtitle = "by Kzu123",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil, -- Tạo thư mục tùy chỉnh cho hub/game của bạn
+      FileName = "Example Hub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink", -- Link mời vào Discord của bạn hoặc thứ khác
+      RememberJoins = true -- Chỉnh thành false để họ tham gia Discord hoặc thứ khác
+   },
+   KeySystem = true, -- Chuyển thành true để tạo gui nhập key và false để tắt gui
+   KeySettings = {
+      Title = "Key | Kzu Hub", -- Tên 
+      Subtitle = "Nhập key tại đây.", -- chú thích
+      Note = "Key ở trong Discord", 
+      FileName = "YoutubeHubKey1", -- Nên sử dụng một cái gì đó độc đáo vì các tập lệnh khác sử dụng Rayfield có thể ghi đè lên tệp khóa của bạn
+      SaveKey = false, -- Chuyển thành true để lưu key khi nhập không cần nhập lại nhưng khi đổi key thì sẽ không được lưu
+      GrabKeyFromSite = true, -- !Không quá quan trọng!
+      Key = {"Free_188BET"} -- Tạo key của bạn (ví dụ: 1234) hoặc có thể viết key của bạn vào link pastebin, github etc rồi dán vào 
+   }
+})
+
+
+
+----- vô hiệu anti cheat
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Vô hiệu hóa anti-cheat dựa trên hàm ẩn
+local function DisableAntiCheat()
+    for _, v in pairs(getgc(true)) do
+        if type(v) == "function" and islclosure(v) then
+            local info = debug.getinfo(v)
+            if info and info.name and (info.name:lower():find("anticheat") or info.name:lower():find("bypass") or info.name:lower():find("detect")) then
+                hookfunction(v, function(...) return nil end) -- Thay vì delay, trả về nil luôn
+            end
+        end
+    end
+end
+
+-- Ngăn chặn game gửi dữ liệu phát hiện cheat lên server
+local function PreventDetection()
+    local mt = getrawmetatable(game)
+    setreadonly(mt, false)
+    local oldNamecall = mt.__namecall
+    mt.__namecall = newcclosure(function(self, ...)
+        local args = {...}
+        local method = getnamecallmethod()
+
+        if method == "FireServer" or method == "InvokeServer" then
+            local remoteName = tostring(self):lower()
+            if remoteName:find("cheat") or remoteName:find("detect") or remoteName:find("log") then
+                return nil -- Không gửi dữ liệu phát hiện cheat
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+end
+
+-- Tự động kích hoạt anti-cheat bypass khi menu bật
+local function ActivateAntiCheatBypass()
+    DisableAntiCheat()
+    PreventDetection()
+    print("✅ Anti-Cheat Bypass Activated!")
+end
+
+ActivateAntiCheatBypass()
+
+
+
+
+local DiscordTab = Window:CreateTab("🌐Discord", nil) -- Code tạo tab , viết tên tab + emoji đều được
+local DiscordSection = DiscordTab:CreateSection("Discord")
+
+
+
+
+local CopyButton = DiscordTab:CreateButton({
+   Name = "Tham gia Discord",
+   Callback = function()
+        setclipboard("https://discord.gg/yourlinkhere") -- Thay bằng link Discord của bạn
+        Rayfield:Notify({
+            Title = "Thông báo",
+            Content = "Đã sao chép link Discord !",
+            Duration = 3,
+            Image = 125562543157030, -- Có thể đổi ảnh thông báo nếu muốn
+            Actions = {
+                Ignore = {
+                    Name = "OK!",
+                    Callback = function()
+                        print("Người dùng đã bấm OK")
+                    end
+                }
+            }
+        })
+   end,
+})
+
+local DiscordSection = DiscordTab:CreateSection("Các chức năng:")
+local DiscordSection = DiscordTab:CreateSection("- Vô hiệu Anti-cheat ✅")
+
+
+local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết tên tab + emoji đều được
+local ScriptSection = ScriptTab:CreateSection("Script")
+
+
+
+
+local noclipEnabled = false local noclipConnection
+
+-- Hàm bật/tắt noclip local function ToggleNoclip(value) noclipEnabled = value
+
+if noclipEnabled then
+    -- Ngắt kết nối cũ nếu có
+    if noclipConnection then
+        noclipConnection:Disconnect()
+    end
+    
+    -- Kết nối mới để vô hiệu hóa va chạm
+    noclipConnection = game:GetService("RunService").Stepped:Connect(function()
+        if LocalPlayer.Character then
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") and part.CanCollide then
+                    part.CanCollide = false
+                end
+            end
+        end
+    end)
+else
+    -- Ngắt kết nối khi tắt noclip
+    if noclipConnection then
+        noclipConnection:Disconnect()
+    end
+end
+
+end
+
+-- Tạo nút bật/tắt trong menu 
+local Toggle = ScriptTab:CreateToggle({ 
+     Name = "Noclip", 
+     CurrentValue = false, 
+     Flag = "Noclip_Toggle", 
+     Callback = function(Value) 
+               ToggleNoclip(Value) 
+     end, 
+})
+
+
