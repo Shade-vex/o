@@ -54,7 +54,7 @@ local ScriptSection = ScriptTab:CreateSection("Script")
 local aimlockEnabled = false
 local aimlockScript = "https://raw.githubusercontent.com/Shade-vex/b/refs/heads/main/Aimlock.txt"
 
-local Toggle = PVP_Tab:CreateToggle({
+local Toggle = ScriptTab:CreateToggle({
    Name = "Aimlock",  -- Tên của nút toggle
    CurrentValue = false,  -- Giá trị ban đầu của nút
    Flag = "Aimlock_Toggle",  -- Dùng flag để xác định
@@ -71,7 +71,7 @@ local Toggle = PVP_Tab:CreateToggle({
 local flyEnabled = false
 local flyScript = "https://raw.githubusercontent.com/Shade-vex/f/refs/heads/main/Fly%5BVIP%5D.txt"
 
-local Toggle = PVP_Tab:CreateToggle({
+local Toggle = ScriptTab:CreateToggle({
    Name = "Fly [VIP]",  -- Tên của nút
    CurrentValue = false,  -- Mặc định tắt
    Flag = "Fly_Toggle",  -- Flag nhận diện toggle
@@ -231,8 +231,7 @@ local function toggleESP(Value)
 end
 
 -- Tạo Tab và Toggle để bật/tắt ESP
-local ESP_Tab = Window:CreateTab("🔥ESP", nil)  -- Tạo Tab 
-local Toggle = ESP_Tab:CreateToggle({
+local Toggle = ScriptTab:CreateToggle({
    Name = "ESP PLAYER",
    CurrentValue = false,
    Flag = "ESP_Toggle",  -- Cờ lưu trữ trạng thái toggle
