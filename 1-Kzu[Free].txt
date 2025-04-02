@@ -249,21 +249,6 @@ local Players = game:GetService("Players")
 local autoFarmEnabled = false
 local speed = 16  -- Tốc độ bay
 
-local Toggle = ScriptTab:CreateToggle({
-   Name = "Auto Bond",
-   CurrentValue = false,
-   Flag = "Toggle10",
-   Callback = function(Value)
-       autoFarmEnabled = Value
-       if autoFarmEnabled then
-           print("Auto Bond Activated")
-           startAutoBond()
-       else
-           print("Auto Bond Deactivated")
-       end
-   end,
-})
-
 -- Hàm tìm item "bond" gần nhất
 local function findNearestBond()
     local closestBond = nil
@@ -321,6 +306,22 @@ local function startAutoBond()
         end
     end)
 end
+
+-- 💡 Đặt Toggle CUỐI CÙNG để tránh lỗi Callback
+local Toggle = ScriptTab:CreateToggle({
+   Name = "Auto Bond",
+   CurrentValue = false,
+   Flag = "Toggle10",
+   Callback = function(Value)
+       autoFarmEnabled = Value
+       if autoFarmEnabled then
+           print("Auto Bond Activated")
+           startAutoBond()
+       else
+           print("Auto Bond Deactivated")
+       end
+   end,
+})
 
 
 
