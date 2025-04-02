@@ -39,25 +39,12 @@ ForceLoadTab()
 
 
 
-local DiscordButton = DiscordTab:CreateButton({
+local CopyButton = DiscordTab:CreateButton({
    Name = "Tham gia Discord",
    Flag = "DiscordButton", -- Identifier cho button này nếu bạn cần lưu cấu hình
    Callback = function()
         setclipboard("https://discord.gg/qjht24NR") -- Thay bằng link Discord của bạn
-        Rayfield:Notify({
-            Title = "Thông báo",
-            Content = "Đã sao chép link Discord!",
-            Duration = 3,
-            Image = 117436152239922, -- Có thể đổi ảnh thông báo nếu muốn
-            Actions = {
-                Ignore = {
-                    Name = "OK!",
-                    Callback = function()
-                        print("Người dùng đã bấm OK")
-                    end
-                }
-            }
-        })
+        print("Link Discord đã được sao chép!") -- In thông báo ra console nếu cần
    end,
 })
 
@@ -112,4 +99,4 @@ local Toggle = ScriptTab:CreateToggle({
    Callback = function(Value)
         ToggleNoclip(Value)
    end,
-}))
+})
