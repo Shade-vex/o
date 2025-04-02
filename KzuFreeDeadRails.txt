@@ -1,48 +1,4 @@
--- 🛡 chống anti cheat
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-
--- Vô hiệu hóa anti-cheat dựa trên hàm ẩn
-local function DisableAntiCheat()
-    for _, v in pairs(getgc(true)) do
-        if type(v) == "function" and islclosure(v) then
-            local info = debug.getinfo(v)
-            if info and info.name and (info.name:lower():find("anticheat") or info.name:lower():find("bypass") or info.name:lower():find("detect")) then
-                hookfunction(v, function(...) return nil end) -- Thay vì delay, trả về nil luôn
-            end
-        end
-    end
-end
-
--- Ngăn chặn game gửi dữ liệu phát hiện cheat lên server
-local function PreventDetection()
-    local mt = getrawmetatable(game)
-    setreadonly(mt, false)
-    local oldNamecall = mt.__namecall
-    mt.__namecall = newcclosure(function(self, ...)
-        local args = {...}
-        local method = getnamecallmethod()
-
-        if method == "FireServer" or method == "InvokeServer" then
-            local remoteName = tostring(self):lower()
-            if remoteName:find("cheat") or remoteName:find("detect") or remoteName:find("log") then
-                return nil -- Không gửi dữ liệu phát hiện cheat
-            end
-        end
-        return oldNamecall(self, ...)
-    end)
-end
-
--- Tự động kích hoạt anti-cheat bypass khi menu bật
-local function ActivateAntiCheatBypass()
-    DisableAntiCheat()
-    PreventDetection()
-    print("✅ Anti-Cheat Bypass Activated!")
-end
-
-ActivateAntiCheatBypass()
 
 
 
@@ -124,3 +80,55 @@ spawn(function()
         warn("❌ Lỗi khi tải script:", err)
     end
 end)
+
+
+
+
+
+
+
+-- 🛡 chống anti cheat
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Vô hiệu hóa anti-cheat dựa trên hàm ẩn
+local function DisableAntiCheat()
+    for _, v in pairs(getgc(true)) do
+        if type(v) == "function" and islclosure(v) then
+            local info = debug.getinfo(v)
+            if info and info.name and (info.name:lower():find("anticheat") or info.name:lower():find("bypass") or info.name:lower():find("detect")) then
+                hookfunction(v, function(...) return nil end) -- Thay vì delay, trả về nil luôn
+            end
+        end
+    end
+end
+
+-- Ngăn chặn game gửi dữ liệu phát hiện cheat lên server
+local function PreventDetection()
+    local mt = getrawmetatable(game)
+    setreadonly(mt, false)
+    local oldNamecall = mt.__namecall
+    mt.__namecall = newcclosure(function(self, ...)
+        local args = {...}
+        local method = getnamecallmethod()
+
+        if method == "FireServer" or method == "InvokeServer" then
+            local remoteName = tostring(self):lower()
+            if remoteName:find("cheat") or remoteName:find("detect") or remoteName:find("log") then
+                return nil -- Không gửi dữ liệu phát hiện cheat
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+end
+
+-- Tự động kích hoạt anti-cheat bypass khi menu bật
+local function ActivateAntiCheatBypass()
+    DisableAntiCheat()
+    PreventDetection()
+    print("✅ Anti-Cheat Bypass Activated!")
+end
+
+ActivateAntiCheatBypass()
