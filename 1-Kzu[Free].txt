@@ -39,14 +39,7 @@ ForceLoadTab()
 
 
 
-local CopyButton = DiscordTab:CreateButton({
-   Name = "Tham gia Discord",
-   Flag = "DiscordButton", -- Identifier cho button này nếu bạn cần lưu cấu hình
-   Callback = function()
-        setclipboard("https://discord.gg/qjht24NR") -- Thay bằng link Discord của bạn
-        print("Link Discord đã được sao chép!") -- In thông báo ra console nếu cần
-   end,
-})
+
 
 local DiscordSection = DiscordTab:CreateSection("Các chức năng:")
 local DiscordSection = DiscordTab:CreateSection("- Vô hiệu Anti-cheat ✅")
