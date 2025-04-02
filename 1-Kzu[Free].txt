@@ -37,7 +37,14 @@ local DiscordTab = Window:CreateTab("🌐Discord", nil) -- Code tạo tab , vi�
 local DiscordSection = DiscordTab:CreateSection("Discord")
 
 
-
+local CopyButton = MainTab:CreateButton({
+   Name = "Tham gia Discord",
+   Flag = "DiscordButton", -- Identifier cho button này nếu bạn cần lưu cấu hình
+   Callback = function()
+        setclipboard("https://discord.gg/qjht24NR") -- Thay bằng link Discord của bạn
+        print("Link Discord đã được sao chép!") -- In thông báo ra console nếu cần
+   end,
+})
 
 
 
