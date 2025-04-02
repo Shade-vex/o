@@ -41,8 +41,7 @@ local DiscordSection = DiscordTab:CreateSection("Discord")
 
 
 
-local DiscordSection = DiscordTab:CreateSection("Các chức năng:")
-local DiscordSection = DiscordTab:CreateSection("- Vô hiệu Anti-cheat ✅")
+
 
 
 local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết tên tab + emoji đều được
