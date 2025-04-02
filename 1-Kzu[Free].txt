@@ -35,7 +35,7 @@ local Window = Rayfield:CreateWindow({
 
 local DiscordTab = Window:CreateTab("🌐Discord", nil) -- Code tạo tab , viết tên tab + emoji đều được
 local DiscordSection = DiscordTab:CreateSection("Discord")
-ForceLoadTab()
+
 
 
 
@@ -47,7 +47,7 @@ local DiscordSection = DiscordTab:CreateSection("- Vô hiệu Anti-cheat ✅")
 
 local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết tên tab + emoji đều được
 local ScriptSection = ScriptTab:CreateSection("Script")
-ForceLoadTab()
+
 
 
 
