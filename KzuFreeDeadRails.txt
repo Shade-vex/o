@@ -1,0 +1,126 @@
+-- 🛡 chống anti cheat
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Vô hiệu hóa anti-cheat dựa trên hàm ẩn
+local function DisableAntiCheat()
+    for _, v in pairs(getgc(true)) do
+        if type(v) == "function" and islclosure(v) then
+            local info = debug.getinfo(v)
+            if info and info.name and (info.name:lower():find("anticheat") or info.name:lower():find("bypass") or info.name:lower():find("detect")) then
+                hookfunction(v, function(...) return nil end) -- Thay vì delay, trả về nil luôn
+            end
+        end
+    end
+end
+
+-- Ngăn chặn game gửi dữ liệu phát hiện cheat lên server
+local function PreventDetection()
+    local mt = getrawmetatable(game)
+    setreadonly(mt, false)
+    local oldNamecall = mt.__namecall
+    mt.__namecall = newcclosure(function(self, ...)
+        local args = {...}
+        local method = getnamecallmethod()
+
+        if method == "FireServer" or method == "InvokeServer" then
+            local remoteName = tostring(self):lower()
+            if remoteName:find("cheat") or remoteName:find("detect") or remoteName:find("log") then
+                return nil -- Không gửi dữ liệu phát hiện cheat
+            end
+        end
+        return oldNamecall(self, ...)
+    end)
+end
+
+-- Tự động kích hoạt anti-cheat bypass khi menu bật
+local function ActivateAntiCheatBypass()
+    DisableAntiCheat()
+    PreventDetection()
+    print("✅ Anti-Cheat Bypass Activated!")
+end
+
+ActivateAntiCheatBypass()
+
+
+
+
+
+
+
+
+
+-- 📌 Tạo GUI Loading
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ProfileImage = Instance.new("ImageLabel")
+local ProgressBar = Instance.new("Frame")
+local ProgressFill = Instance.new("Frame")
+local TextLabel = Instance.new("TextLabel")
+local UICorner = Instance.new("UICorner")
+
+-- 🔹 Cài đặt GUI
+ScreenGui.Parent = game.CoreGui
+ScreenGui.Name = "LoadingGUI"
+
+MainFrame.Parent = ScreenGui
+MainFrame.Size = UDim2.new(0, 350, 0, 120)
+MainFrame.Position = UDim2.new(0.5, -175, 0.5, -60)
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 2
+MainFrame.BorderColor3 = Color3.fromRGB(255, 255, 255)
+
+ProfileImage.Parent = MainFrame
+ProfileImage.Size = UDim2.new(0, 50, 0, 50)
+ProfileImage.Position = UDim2.new(0, 10, 0, 10)
+ProfileImage.Image = "rbxassetid://117436152239922"
+ProfileImage.BackgroundTransparency = 1
+
+TextLabel.Parent = MainFrame
+TextLabel.Size = UDim2.new(1, -70, 0, 30)
+TextLabel.Position = UDim2.new(0, 70, 0, 10)
+TextLabel.Text = "by Kzu123"
+TextLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TextLabel.TextScaled = true
+TextLabel.Font = Enum.Font.SourceSansBold
+TextLabel.BackgroundTransparency = 1
+
+ProgressBar.Parent = MainFrame
+ProgressBar.Size = UDim2.new(0.9, 0, 0, 15)
+ProgressBar.Position = UDim2.new(0.05, 0, 0.6, 0)
+ProgressBar.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+
+UICorner.Parent = ProgressBar
+UICorner.CornerRadius = UDim.new(0, 10)
+
+ProgressFill.Parent = ProgressBar
+ProgressFill.Size = UDim2.new(0, 0, 1, 0)
+ProgressFill.BackgroundColor3 = Color3.fromRGB(0, 122, 255)
+
+UICorner:Clone().Parent = ProgressFill
+
+-- 🔄 Hiệu ứng loading
+spawn(function()
+    for i = 1, 100 do
+        ProgressFill.Size = UDim2.new(i / 100, 0, 1, 0)
+        wait(0.05)
+    end
+
+    -- 🚀 Xóa GUI ngay khi loading đạt 100%
+    ScreenGui:Destroy()
+
+    -- ⏳ Chờ 0.1 giây trước khi tải script chính
+    wait(0.1)
+
+    -- 🕒 Load script chính
+    local success, err = pcall(function()
+        loadstring(game:HttpGet("https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/1-Kzu%5BFree%5D.txt"))()
+    end)
+
+    -- 🛑 Cảnh báo nếu tải lỗi
+    if not success then
+        warn("❌ Lỗi khi tải script:", err)
+    end
+end)
