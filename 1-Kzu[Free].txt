@@ -244,62 +244,76 @@ local Toggle = ScriptTab:CreateToggle({
 
 
 
+local autoFarmEnabled = false  -- Trạng thái của Auto Bond
+
 local Toggle = ScriptTab:CreateToggle({
    Name = "Auto Bond",
    CurrentValue = false,
-   Flag = "AutoBond_Toggle", -- A flag is the identifier for the configuration file, make sure every element has a different flag if you're using configuration saving to ensure no overlaps
+   Flag = "Toggle97",
    Callback = function(Value)
-        if Value then
-            -- Khi bật Auto Bond
-            print("Auto Bond Activated")
-            -- Thực hiện script auto farm
-            startAutoBond()
-        else
-            -- Khi tắt Auto Bond
-            print("Auto Bond Deactivated")
-            -- Dừng lại quá trình farm
-            stopAutoBond()
-        end
+       autoFarmEnabled = Value
+       if autoFarmEnabled then
+           print("Auto Bond Activated")
+           startAutoBond()
+       else
+           print("Auto Bond Deactivated")
+       end
    end,
 })
 
-local autoFarmEnabled = false
+-- Hàm tìm item gần nhất
+local function findNearestBond()
+    local closestBond = nil
+    local shortestDistance = math.huge
+    local character = game.Players.LocalPlayer.Character
 
--- Hàm bắt đầu quá trình auto bond
-local function startAutoBond()
-    autoFarmEnabled = true
-    while autoFarmEnabled do
-        -- Tìm kiếm tất cả các item có tên "bond" trong game
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local hrp = character.HumanoidRootPart
+
         for _, item in pairs(workspace:GetChildren()) do
-            if item.Name == "bond" and item:IsA("Part") then
-                -- Tính toán khoảng cách và bay đến item bond
-                local character = game.Players.LocalPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
-                    local targetPosition = item.Position
-                    local humanoidRootPart = character:FindFirstChild("HumanoidRootPart")
-                    
-                    -- Tính hướng di chuyển (vector)
-                    local direction = (targetPosition - humanoidRootPart.Position).unit
-                    local speed = 16  -- Tốc độ bay
-                    
-                    -- Bay đến item với tốc độ
-                    humanoidRootPart.Velocity = direction * speed
-                    
-                    -- Đảm bảo có thể đi xuyên tường
-                    humanoidRootPart.CanCollide = false
-                    
-                    -- Kiểm tra nếu nhân vật đã đến gần item để nhặt
-                    if (humanoidRootPart.Position - targetPosition).Magnitude < 5 then
-                        item:Destroy()  -- Giả định nhặt item bằng cách xóa nó
-                    end
+            if item:IsA("Part") and item.Name == "bond" then
+                local distance = (hrp.Position - item.Position).Magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestBond = item
                 end
             end
         end
-        wait(0.1) -- Tốc độ quét mỗi lần tìm kiếm (có thể tùy chỉnh)
+    end
+
+    return closestBond
+end
+
+-- Hàm bay đến item
+local function flyTo(target)
+    local character = game.Players.LocalPlayer.Character
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        local hrp = character.HumanoidRootPart
+        local speed = 16  -- Tốc độ bay
+        local direction = (target.Position - hrp.Position).unit
+
+        -- Bay về hướng item với tốc độ 16
+        hrp.Velocity = direction * speed
+        hrp.CanCollide = false  -- Đi xuyên tường
     end
 end
 
--- Hàm dừng auto bond
-local function stopAutoBond()
-    autoFarmEnabled = false
-end
+-- Hàm Auto Bond
+local function startAutoBond()
+    while autoFarmEnabled do
+        local bond = findNearestBond()
+        if bond then
+            flyTo(bond)
+
+            -- Kiểm tra nếu đến gần item thì nhặt
+            local character = game.Players.LocalPlayer.Character
+            if character and character:FindFirstChild("HumanoidRootPart") then
+                local hrp = character.HumanoidRootPart
+                if (hrp.Position - bond.Position).Magnitude < 5 then
+                    bond:Destroy()  -- Mô phỏng nhặt item
+                end
+            end
+        end
+        wait(0.1)  -- Chạy lặp lại mỗi 0.1 giây
+    end
+end 
