@@ -20,7 +20,7 @@ local Window = Rayfield:CreateWindow({
       Subtitle = "Nhập key tại đây.", -- chú thích
       Note = "Key ở trong Discord", 
       FileName = "YoutubeHubKey1", -- Nên sử dụng một cái gì đó độc đáo vì các tập lệnh khác sử dụng Rayfield có thể ghi đè lên tệp khóa của bạn
-      SaveKey = false, -- Chuyển thành true để lưu key khi nhập không cần nhập lại nhưng khi đổi key thì sẽ không được lưu
+      SaveKey = true, -- Chuyển thành true để lưu key khi nhập không cần nhập lại nhưng khi đổi key thì sẽ không được lưu
       GrabKeyFromSite = true, -- !Không quá quan trọng!
       Key = {"Free_DeadRails:ksjdla"} -- Tạo key của bạn (ví dụ: 1234) hoặc có thể viết key của bạn vào link pastebin, github etc rồi dán vào 
    }
@@ -39,15 +39,16 @@ ForceLoadTab()
 
 
 
-local CopyButton = DiscordTab:CreateButton({
+local DiscordButton = DiscordTab:CreateButton({
    Name = "Tham gia Discord",
+   Flag = "DiscordButton", -- Identifier cho button này nếu bạn cần lưu cấu hình
    Callback = function()
-        setclipboard("https://discord.gg/yourlinkhere") -- Thay bằng link Discord của bạn
+        setclipboard("https://discord.gg/qjht24NR") -- Thay bằng link Discord của bạn
         Rayfield:Notify({
             Title = "Thông báo",
-            Content = "Đã sao chép link Discord !",
+            Content = "Đã sao chép link Discord!",
             Duration = 3,
-            Image = 125562543157030, -- Có thể đổi ảnh thông báo nếu muốn
+            Image = 117436152239922, -- Có thể đổi ảnh thông báo nếu muốn
             Actions = {
                 Ignore = {
                     Name = "OK!",
@@ -111,4 +112,4 @@ local Toggle = ScriptTab:CreateToggle({
    Callback = function(Value)
         ToggleNoclip(Value)
    end,
-})
+}))
