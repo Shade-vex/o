@@ -48,6 +48,64 @@ local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết
 local ScriptSection = ScriptTab:CreateSection("Script")
 
 
+-- Tốc độ
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local speedMultiplier = 1  -- Giá trị mặc định
+
+local function setWalkSpeed(speed)
+    if LocalPlayer and LocalPlayer.Character then
+        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Humanoid then
+            Humanoid.WalkSpeed = speed
+        end
+    end
+end
+
+local function boostSpeed()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart then
+                -- Nếu WalkSpeed không bị chặn, dùng WalkSpeed
+                if Humanoid and Humanoid.WalkSpeed ~= 16 then
+                    Humanoid.WalkSpeed = 16 * speedMultiplier
+                else
+                    -- Nếu WalkSpeed bị chặn, dùng Velocity hoặc CFrame để di chuyển nhanh hơn
+                    local moveDirection = Humanoid and Humanoid.MoveDirection or Vector3.new()
+                    RootPart.Velocity = moveDirection * (16 * speedMultiplier)
+                    RootPart.CFrame = RootPart.CFrame + moveDirection * (0.1 * speedMultiplier)
+                end
+            end
+        end
+    end)
+end
+
+local Slider = ScriptTab:CreateSlider({
+    Name = "Tốc Độ",
+    Range = {1, 500},
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 1,
+    Flag = "sliderws", 
+    Callback = function(Value)
+        speedMultiplier = Value
+        setWalkSpeed(16 * speedMultiplier)  -- Cập nhật WalkSpeed nếu có thể
+    end,
+})
+
+boostSpeed()  -- Kích hoạt tăng tốc
+
+
+
+
+
+
 
 -- aimbot
 
