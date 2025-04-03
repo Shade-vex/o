@@ -68,17 +68,6 @@ local function setWalkSpeed(speed)
     end
 end
 
--- Kiểm tra nếu nhân vật đang ở trên mặt đất
-local function isOnGround()
-    if LocalPlayer and LocalPlayer.Character then
-        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-        if Humanoid then
-            return Humanoid:GetState() == Enum.HumanoidStateType.Physics
-        end
-    end
-    return false
-end
-
 -- Kích hoạt tăng tốc
 local function boostSpeed()
     RunService.RenderStepped:Connect(function()
@@ -87,12 +76,9 @@ local function boostSpeed()
             local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
             if RootPart and Humanoid then
-                -- Kiểm tra nếu nhân vật đang di chuyển và đang ở trên mặt đất
-                if Humanoid.MoveDirection.Magnitude > 0 and isOnGround() then
+                -- Kiểm tra xem nhân vật có di chuyển không
+                if Humanoid.MoveDirection.Magnitude > 0 then
                     RootPart.Velocity = Humanoid.MoveDirection * currentSpeed  -- Chỉnh tốc độ di chuyển
-                elseif not isOnGround() then
-                    -- Nếu nhân vật không đứng trên mặt đất, để velocity mặc định, tránh lơ lửng
-                    RootPart.Velocity = Vector3.new(0, RootPart.Velocity.Y, 0)
                 end
             end
         end
