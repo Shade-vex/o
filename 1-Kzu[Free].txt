@@ -68,36 +68,17 @@ local function setWalkSpeed(speed)
     end
 end
 
--- Tăng tốc khi nhảy và di chuyển trong không khí
-local function boostSpeedInAir()
+-- Kích hoạt tăng tốc
+local function boostSpeed()
     RunService.RenderStepped:Connect(function()
         if LocalPlayer and LocalPlayer.Character then
             local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
             if RootPart and Humanoid then
-                -- Kiểm tra trạng thái của nhân vật khi nhảy
-                if Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-                    -- Khi nhảy, vẫn cho phép di chuyển nhanh trong không khí
-                    RootPart.Velocity = Vector3.new(Humanoid.MoveDirection.X * currentSpeed, RootPart.Velocity.Y, Humanoid.MoveDirection.Z * currentSpeed)
-                end
-            end
-        end
-    end)
-end
-
--- Tăng tốc khi di chuyển trên mặt đất
-local function boostSpeedOnGround()
-    RunService.RenderStepped:Connect(function()
-        if LocalPlayer and LocalPlayer.Character then
-            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
-            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
-
-            if RootPart and Humanoid then
-                -- Kiểm tra trạng thái của nhân vật khi di chuyển trên mặt đất
-                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
-                    -- Nhân vật đang di chuyển trên mặt đất
-                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                -- Kiểm tra xem nhân vật có di chuyển không
+                if Humanoid.MoveDirection.Magnitude > 0 then
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed  -- Chỉnh tốc độ di chuyển
                 end
             end
         end
@@ -118,9 +99,7 @@ local Slider = ScriptTab:CreateSlider({
     end,
 })
 
--- Kích hoạt hai hàm tăng tốc
-boostSpeedInAir()  -- Kích hoạt tăng tốc khi nhảy và di chuyển trên không khí
-boostSpeedOnGround()  -- Kích hoạt tăng tốc khi di chuyển trên mặt đất
+boostSpeed()  -- Kích hoạt hệ thống tăng tốc
 
 
 
