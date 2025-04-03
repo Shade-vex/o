@@ -76,9 +76,13 @@ local function boostSpeed()
             local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
             if RootPart and Humanoid then
-                -- Kiểm tra xem nhân vật có di chuyển không
-                if Humanoid.MoveDirection.Magnitude > 0 then
-                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed  -- Chỉnh tốc độ di chuyển
+                -- Kiểm tra trạng thái của nhân vật
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Nhân vật đang di chuyển trên mặt đất
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                elseif Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                    -- Khi nhảy hoặc rơi, không thay đổi Velocity để tránh bay lơ lửng
+                    RootPart.Velocity = Vector3.new(0, RootPart.Velocity.Y, 0)
                 end
             end
         end
