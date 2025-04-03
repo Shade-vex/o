@@ -81,8 +81,8 @@ local function boostSpeed()
                     -- Nhân vật đang di chuyển trên mặt đất
                     RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
                 elseif Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
-                    -- Khi nhảy hoặc rơi, không thay đổi Velocity để tránh bay lơ lửng
-                    RootPart.Velocity = Vector3.new(0, RootPart.Velocity.Y, 0)
+                    -- Khi nhảy, nhân vật vẫn có thể di chuyển, nhưng không bị bay lên
+                    RootPart.Velocity = Vector3.new(Humanoid.MoveDirection.X * currentSpeed, RootPart.Velocity.Y, Humanoid.MoveDirection.Z * currentSpeed)
                 end
             end
         end
