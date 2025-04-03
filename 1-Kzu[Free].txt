@@ -48,14 +48,17 @@ local ScriptTab = Window:CreateTab("📋Script", nil) -- Code tạo tab , viết
 local ScriptSection = ScriptTab:CreateSection("Script")
 
 
--- Tốc độ
 
+
+-- Tốc độ
 
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
-local speedMultiplier = 1  -- Giá trị mặc định
+local defaultSpeed = 16  -- Tốc độ mặc định
+local currentSpeed = defaultSpeed  -- Biến lưu tốc độ hiện tại
 
+-- Hàm thay đổi tốc độ đi bộ
 local function setWalkSpeed(speed)
     if LocalPlayer and LocalPlayer.Character then
         local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
@@ -65,44 +68,38 @@ local function setWalkSpeed(speed)
     end
 end
 
+-- Kích hoạt tăng tốc
 local function boostSpeed()
     RunService.RenderStepped:Connect(function()
         if LocalPlayer and LocalPlayer.Character then
             local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
             local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
-            if RootPart then
-                -- Nếu WalkSpeed không bị chặn, dùng WalkSpeed
-                if Humanoid and Humanoid.WalkSpeed ~= 16 then
-                    Humanoid.WalkSpeed = 16 * speedMultiplier
-                else
-                    -- Nếu WalkSpeed bị chặn, dùng Velocity hoặc CFrame để di chuyển nhanh hơn
-                    local moveDirection = Humanoid and Humanoid.MoveDirection or Vector3.new()
-                    RootPart.Velocity = moveDirection * (16 * speedMultiplier)
-                    RootPart.CFrame = RootPart.CFrame + moveDirection * (0.1 * speedMultiplier)
+            if RootPart and Humanoid then
+                -- Kiểm tra xem nhân vật có di chuyển không
+                if Humanoid.MoveDirection.Magnitude > 0 then
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed  -- Chỉnh tốc độ di chuyển
                 end
             end
         end
     end)
 end
 
+-- Tạo thanh chỉnh tốc độ
 local Slider = ScriptTab:CreateSlider({
     Name = "Tốc Độ",
-    Range = {1, 500},
+    Range = {1, 500},  -- Giờ có thể chỉnh từ 1 đến 500
     Increment = 1,
     Suffix = "Speed",
-    CurrentValue = 1,
+    CurrentValue = 16,  -- Mặc định là 16
     Flag = "sliderws", 
     Callback = function(Value)
-        speedMultiplier = Value
-        setWalkSpeed(16 * speedMultiplier)  -- Cập nhật WalkSpeed nếu có thể
+        currentSpeed = Value
+        setWalkSpeed(currentSpeed)  -- Cập nhật tốc độ ngay lập tức
     end,
 })
 
-boostSpeed()  -- Kích hoạt tăng tốc
-
-
-
+boostSpeed()  -- Kích hoạt hệ thống tăng tốc
 
 
 
