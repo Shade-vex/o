@@ -49,7 +49,96 @@ local ScriptSection = ScriptTab:CreateSection("Script")
 
 
 
+-- Tốc độ
 
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local defaultSpeed = 16  -- Tốc độ mặc định
+local currentSpeed = defaultSpeed  -- Biến lưu tốc độ hiện tại
+
+-- Hàm thay đổi tốc độ đi bộ
+local function setWalkSpeed(speed)
+    if LocalPlayer and LocalPlayer.Character then
+        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Humanoid then
+            Humanoid.WalkSpeed = speed
+        end
+    end
+end
+
+-- Tăng tốc khi di chuyển trên mặt đất
+local function boostSpeedOnGround()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi di chuyển trên mặt đất
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Nhân vật đang di chuyển trên mặt đất, tăng tốc di chuyển
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                end
+            end
+        end
+    end)
+end
+
+-- Tăng tốc khi nhảy và di chuyển trong không khí
+local function boostSpeedInAir()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi nhảy
+                if Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                    -- Khi nhảy, vẫn cho phép di chuyển nhanh trong không khí
+                    RootPart.Velocity = Vector3.new(Humanoid.MoveDirection.X * currentSpeed, RootPart.Velocity.Y, Humanoid.MoveDirection.Z * currentSpeed)
+                end
+            end
+        end
+    end)
+end
+
+-- Tăng tốc khi đang chạy hoặc di chuyển trên mặt đất (thêm vào khi không có nhảy)
+local function boostSpeedWhileRunning()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái khi di chuyển
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Đảm bảo không bị giật và tăng tốc ổn định
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                end
+            end
+        end
+    end)
+end
+
+-- Tạo thanh chỉnh tốc độ
+local Slider = ScriptTab:CreateSlider({
+    Name = "Tốc Độ",
+    Range = {1, 500},  -- Giờ có thể chỉnh từ 1 đến 500
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,  -- Mặc định là 16
+    Flag = "sliderws", 
+    Callback = function(Value)
+        currentSpeed = Value
+        setWalkSpeed(currentSpeed)  -- Cập nhật tốc độ ngay lập tức
+    end,
+})
+
+-- Kích hoạt 3 hàm tăng tốc
+boostSpeedInAir()  -- Kích hoạt tăng tốc khi nhảy và di chuyển trên không khí
+boostSpeedOnGround()  -- Kích hoạt tăng tốc khi di chuyển trên mặt đất
+boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (trường hợp không nhảy)
 
 
 
