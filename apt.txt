@@ -1,0 +1,74 @@
+local player = game.Players.LocalPlayer
+local ownerUserId = 4539739448
+local RunService = game:GetService("RunService")
+
+local function sendNotification(title, text, duration)
+    pcall(function()
+        game.StarterGui:SetCore("SendNotification", {
+            Title = title,
+            Text = text,
+            Duration = duration or 4
+        })
+    end)
+end
+
+game.Players.PlayerAdded:Connect(function(plr)
+    if plr.UserId == ownerUserId then
+        for _, otherPlr in pairs(game.Players:GetPlayers()) do
+            if otherPlr ~= plr then
+                sendNotification("Script Owner Joined", "Kzu123 joined this server!", 5)
+            end
+        end
+    end
+end)
+
+local success, library = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+end)
+
+if not success or not library then
+    sendNotification("Error", "Failed to load Kzu123 Script OP", 5)
+    return
+end
+
+local window = library:CreateWindow("Kzu beta [Free]")
+
+window:AddButton({
+    text = "Teleport To End",
+    callback = function()
+        sendNotification("Spam Button If Not Teleported", "Keep clicking if teleport fails", 4)
+        wait(1)
+        player.Character:PivotTo(CFrame.new(-346, -69, -49060))
+    end
+})
+
+local noclipEnabled = false
+local function toggleNoclip()
+    noclipEnabled = not noclipEnabled
+    for _, part in pairs(player.Character:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = not noclipEnabled
+        end
+    end
+end
+
+RunService.Stepped:Connect(function()
+    if noclipEnabled and player.Character then
+        for _, part in pairs(player.Character:GetDescendants()) do
+            if part:IsA("BasePart") then
+                part.CanCollide = false
+            end
+        end
+    end
+end)
+
+window:AddButton({
+    text = "NoClip V2",
+    callback = function()
+        toggleNoclip()
+        sendNotification("NoClip Status", "NoClip is now " .. (noclipEnabled and "Enabled" or "Disabled"), 4)
+    end
+})
+
+window:AddLabel({ text = "Credits:  Kzu123 & acsu123", type = "label" })
+library:Init()
