@@ -149,22 +149,24 @@ boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (tr�
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
+local UserInputService = game:GetService("UserInputService")
 
 local autoMove = false  -- Trạng thái bật/tắt
 
--- Phương thức cho PC (gửi phím W để di chuyển)
+-- Phương thức giả lập phím W cho PC
 local function moveForwardPC()
     while autoMove do
+        -- Nhấn phím W để di chuyển về phía trước
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.W, false, nil)  -- Nhấn phím W
         RunService.Heartbeat:Wait()
+        
+        -- Sau đó thả phím W nhẹ nhàng
+        VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, nil)  -- Thả phím W
+        RunService.Heartbeat:Wait()
     end
-    -- Thả phím W khi tắt auto
-    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, nil)  -- Thả phím W
 end
 
--- Phương thức cho mobile (mô phỏng chạm và giữ joystick ảo)
+-- Phương thức giả lập chạm và kéo joystick cho mobile
 local function moveForwardMobile()
     local joystickX, joystickY = 200, 800  -- Vị trí của joystick
     local moveX, moveY = 200, 600  -- Kéo joystick lên
@@ -174,20 +176,21 @@ local function moveForwardMobile()
         VirtualInputManager:SendTouchEvent(joystickX, joystickY, true, nil)  -- Chạm vào joystick
         VirtualInputManager:SendTouchEvent(moveX, moveY, true, nil)  -- Kéo joystick lên
         RunService.Heartbeat:Wait()
-    end
 
-    -- Thả joystick khi tắt auto
-    VirtualInputManager:SendTouchEvent(joystickX, joystickY, false, nil)  -- Thả joystick
-    VirtualInputManager:SendTouchEvent(moveX, moveY, false, nil)  -- Thả joystick
+        -- Sau đó thả joystick để tránh bị phát hiện là gian lận
+        VirtualInputManager:SendTouchEvent(joystickX, joystickY, false, nil)  -- Thả joystick
+        VirtualInputManager:SendTouchEvent(moveX, moveY, false, nil)  -- Thả joystick
+        RunService.Heartbeat:Wait()
+    end
 end
 
--- Kiểm tra nếu đang chạy trên mobile hay PC
+-- Kiểm tra nền tảng (PC hay mobile) và chạy phương thức tương ứng
 local function checkPlatformAndRun()
-    if game:GetService("UserInputService").TouchEnabled then
-        -- Nếu đang chạy trên mobile, sử dụng phương thức moveForwardMobile
+    if UserInputService.TouchEnabled then
+        -- Nếu đang chơi trên mobile, sử dụng phương thức moveForwardMobile
         moveForwardMobile()
     else
-        -- Nếu đang chạy trên PC, sử dụng phương thức moveForwardPC
+        -- Nếu đang chơi trên PC, sử dụng phương thức moveForwardPC
         moveForwardPC()
     end
 end
