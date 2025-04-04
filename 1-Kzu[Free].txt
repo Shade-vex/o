@@ -209,9 +209,43 @@ local Toggle = ScriptTab:CreateToggle({
 })
 
 
+-- đến end
 
+game.Players.PlayerAdded:Connect(function(plr)
+    if plr.UserId == ownerUserId then
+        for _, otherPlr in pairs(game.Players:GetPlayers()) do
+            if otherPlr ~= plr then
+                sendNotification("Script Owner Joined", "Kzu123 joined this server!", 5)
+            end
+        end
+    end
+end)
 
+local success, library = pcall(function()
+    return loadstring(game:HttpGet("https://raw.githubusercontent.com/liebertsx/Tora-Library/main/src/librarynew", true))()
+end)
 
+if not success or not library then
+    sendNotification("Error", "Failed to load Kzu123 Script OP", 5)
+    return
+end
+
+local window = library:CreateWindow("DEAD RAILS")
+
+local Toggle = ScriptTab:CreateToggle({
+   Name = "Teleport to END",
+   CurrentValue = false,
+   Flag = "Toggle188", 
+   Callback = function(Value)
+        if Value then
+            print("Auto Farm Enabled")
+            -- Code Auto Farm ở đây
+        else
+            print("Auto Farm Disabled")
+            -- Code để dừng Auto Farm ở đây
+        end
+   end,
+})
 
 
 -- aimbot
@@ -406,84 +440,20 @@ local Toggle = ScriptTab:CreateToggle({
 })
 
 
+-- tự động lấy bond
 
 
+local autobondEnabled = false
+local autobondScript = "https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/dead-rails-auto-bond.txt"
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local autoFarmEnabled = false
-local speed = 16  -- Tốc độ bay
-
--- Hàm tìm item "bond" gần nhất
-local function findNearestBond()
-    local closestBond = nil
-    local shortestDistance = math.huge
-    local character = Players.LocalPlayer.Character
-
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        local hrp = character.HumanoidRootPart
-
-        for _, item in pairs(workspace:GetChildren()) do
-            if item:IsA("Part") and item.Name == "bond" then
-                local distance = (hrp.Position - item.Position).Magnitude
-                if distance < shortestDistance then
-                    shortestDistance = distance
-                    closestBond = item
-                end
-            end
-        end
-    end
-
-    return closestBond
-end
-
--- Hàm bay đến item
-local function flyTo(target)
-    local character = Players.LocalPlayer.Character
-    if character and character:FindFirstChild("HumanoidRootPart") then
-        local hrp = character.HumanoidRootPart
-        local direction = (target.Position - hrp.Position).unit
-
-        -- Bay đến item với tốc độ 16
-        hrp.Velocity = direction * speed
-        hrp.CanCollide = false  -- Xuyên tường
-    end
-end
-
--- Hàm Auto Bond (chạy liên tục khi bật)
-local function startAutoBond()
-    task.spawn(function()
-        while autoFarmEnabled do
-            local bond = findNearestBond()
-            if bond then
-                flyTo(bond)
-
-                -- Kiểm tra nếu gần item thì nhặt
-                local character = Players.LocalPlayer.Character
-                if character and character:FindFirstChild("HumanoidRootPart") then
-                    local hrp = character.HumanoidRootPart
-                    if (hrp.Position - bond.Position).Magnitude < 5 then
-                        bond:Destroy()  -- Mô phỏng nhặt item
-                    end
-                end
-            end
-            task.wait(0.1)  -- Chạy mượt, không lag
-        end
-    end)
-end
-
--- 💡 Đặt Toggle CUỐI CÙNG để tránh lỗi Callback
 local Toggle = ScriptTab:CreateToggle({
-   Name = "Auto Bond",
-   CurrentValue = false,
-   Flag = "Toggle10",
+   Name = "Auto Bond",  -- Tên của nút toggle
+   CurrentValue = false,  -- Giá trị ban đầu của nút
+   Flag = "Autobond_Toggle",  -- Dùng flag để xác định
    Callback = function(Value)
-       autoFarmEnabled = Value
-       if autoFarmEnabled then
-           print("Auto Bond Activated")
-           startAutoBond()
-       else
-           print("Auto Bond Deactivated")
-       end
+        autobondEnabled = Value
+        if autobondEnabled then
+            loadstring(game:HttpGet(autobondScript))()  -- Tải và chạy script Aimlock khi bật
+        end
    end,
-})
+}) 
