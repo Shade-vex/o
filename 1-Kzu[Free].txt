@@ -149,31 +149,58 @@ boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (tr�
 
 local VirtualInputManager = game:GetService("VirtualInputManager")
 local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
--- Tọa độ joystick (có thể chỉnh lại nếu cần)
-local startX, startY = 200, 800  -- Điểm chạm joystick
-local moveX, moveY = 200, 600  -- Kéo joystick lên
+local autoMove = false  -- Trạng thái bật/tắt
 
-local autoMove = false  -- Biến bật/tắt auto
-
-local function holdJoystick()
+-- Phương thức cho PC (gửi phím W để di chuyển)
+local function moveForwardPC()
     while autoMove do
-        VirtualInputManager:SendTouchEvent(startX, startY, true, nil)  -- Chạm vào joystick
+        VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.W, false, nil)  -- Nhấn phím W
         RunService.Heartbeat:Wait()
-        VirtualInputManager:SendTouchEvent(moveX, moveY, true, nil)  -- Kéo lên để đi
+    end
+    -- Thả phím W khi tắt auto
+    VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, nil)  -- Thả phím W
+end
+
+-- Phương thức cho mobile (mô phỏng chạm và giữ joystick ảo)
+local function moveForwardMobile()
+    local joystickX, joystickY = 200, 800  -- Vị trí của joystick
+    local moveX, moveY = 200, 600  -- Kéo joystick lên
+
+    while autoMove do
+        -- Giữ joystick để di chuyển
+        VirtualInputManager:SendTouchEvent(joystickX, joystickY, true, nil)  -- Chạm vào joystick
+        VirtualInputManager:SendTouchEvent(moveX, moveY, true, nil)  -- Kéo joystick lên
         RunService.Heartbeat:Wait()
+    end
+
+    -- Thả joystick khi tắt auto
+    VirtualInputManager:SendTouchEvent(joystickX, joystickY, false, nil)  -- Thả joystick
+    VirtualInputManager:SendTouchEvent(moveX, moveY, false, nil)  -- Thả joystick
+end
+
+-- Kiểm tra nếu đang chạy trên mobile hay PC
+local function checkPlatformAndRun()
+    if game:GetService("UserInputService").TouchEnabled then
+        -- Nếu đang chạy trên mobile, sử dụng phương thức moveForwardMobile
+        moveForwardMobile()
+    else
+        -- Nếu đang chạy trên PC, sử dụng phương thức moveForwardPC
+        moveForwardPC()
     end
 end
 
--- Tạo nút bật/tắt trong menu của Script Hub
+-- Thêm toggle vào menu Script Hub
 local Toggle = ScriptTab:CreateToggle({
    Name = "Auto Drive",
    CurrentValue = false,
    Flag = "ToggleAutoDrive",
    Callback = function(Value)
-        autoMove = Value  -- Bật/tắt auto
+        autoMove = Value  -- Cập nhật trạng thái
         if autoMove then
-            task.spawn(holdJoystick)  -- Chạy auto
+            task.spawn(checkPlatformAndRun)  -- Kiểm tra và chạy đúng phương thức tùy theo nền tảng
         end
    end,
 })
