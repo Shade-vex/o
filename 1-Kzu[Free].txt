@@ -156,11 +156,11 @@ local autoMove = false  -- Trạng thái bật/tắt
 -- Phương thức giả lập phím W cho PC
 local function moveForwardPC()
     while autoMove do
-        -- Nhấn phím W để di chuyển về phía trước
+        -- Giả lập phím W nhấn và thả liên tục
         VirtualInputManager:SendKeyEvent(true, Enum.KeyCode.W, false, nil)  -- Nhấn phím W
         RunService.Heartbeat:Wait()
-        
-        -- Sau đó thả phím W nhẹ nhàng
+
+        -- Thả phím W sau một chút thời gian
         VirtualInputManager:SendKeyEvent(false, Enum.KeyCode.W, false, nil)  -- Thả phím W
         RunService.Heartbeat:Wait()
     end
@@ -168,16 +168,16 @@ end
 
 -- Phương thức giả lập chạm và kéo joystick cho mobile
 local function moveForwardMobile()
-    local joystickX, joystickY = 200, 800  -- Vị trí của joystick
-    local moveX, moveY = 200, 600  -- Kéo joystick lên
+    local joystickX, joystickY = 200, 800  -- Vị trí của joystick (có thể thay đổi theo game)
+    local moveX, moveY = 200, 600  -- Vị trí kéo joystick lên
 
     while autoMove do
-        -- Giữ joystick để di chuyển
+        -- Giả lập chạm và kéo joystick (tạo mô phỏng hành động di chuyển)
         VirtualInputManager:SendTouchEvent(joystickX, joystickY, true, nil)  -- Chạm vào joystick
         VirtualInputManager:SendTouchEvent(moveX, moveY, true, nil)  -- Kéo joystick lên
         RunService.Heartbeat:Wait()
 
-        -- Sau đó thả joystick để tránh bị phát hiện là gian lận
+        -- Thả joystick sau mỗi lần chạm để tránh bị phát hiện
         VirtualInputManager:SendTouchEvent(joystickX, joystickY, false, nil)  -- Thả joystick
         VirtualInputManager:SendTouchEvent(moveX, moveY, false, nil)  -- Thả joystick
         RunService.Heartbeat:Wait()
