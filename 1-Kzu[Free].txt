@@ -143,6 +143,47 @@ boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (tr�
 
 
 
+-- tự lái
+
+
+
+local VirtualInputManager = game:GetService("VirtualInputManager")
+local RunService = game:GetService("RunService")
+
+-- Tọa độ joystick (có thể chỉnh lại nếu cần)
+local startX, startY = 200, 800  -- Điểm chạm joystick
+local moveX, moveY = 200, 600  -- Kéo joystick lên
+
+local autoMove = false  -- Biến bật/tắt auto
+
+local function holdJoystick()
+    while autoMove do
+        VirtualInputManager:SendTouchEvent(startX, startY, true, nil)  -- Chạm vào joystick
+        RunService.Heartbeat:Wait()
+        VirtualInputManager:SendTouchEvent(moveX, moveY, true, nil)  -- Kéo lên để đi
+        RunService.Heartbeat:Wait()
+    end
+end
+
+-- Tạo nút bật/tắt trong menu của Script Hub
+local Toggle = ScriptTab:CreateToggle({
+   Name = "Auto Drive",
+   CurrentValue = false,
+   Flag = "ToggleAutoDrive",
+   Callback = function(Value)
+        autoMove = Value  -- Bật/tắt auto
+        if autoMove then
+            task.spawn(holdJoystick)  -- Chạy auto
+        end
+   end,
+})
+
+
+
+
+
+
+
 -- aimbot
 
 local aimlockEnabled = false
