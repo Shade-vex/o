@@ -1,0 +1,599 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🔰 Maru hub [Premium] 🔰", -- Tên hub của bạn trong menu
+   LoadingTitle = "🔰 Maru hub [Premium] 🔰", -- Tên hub của bạn trong khi load
+   LoadingSubtitle = "by Kzu123",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil, -- Tạo thư mục tùy chỉnh cho hub/game của bạn
+      FileName = "Example Hub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink", -- Link mời vào Discord của bạn hoặc thứ khác
+      RememberJoins = true -- Chỉnh thành false để họ tham gia Discord hoặc thứ khác
+   },
+   KeySystem = true, -- Chuyển thành true để tạo gui nhập key và false để tắt gui
+   KeySettings = {
+      Title = "Maru hub [Premium]", -- Tên 
+      Subtitle = "Nhập key tại đây.", -- chú thích
+      Note = "Key ở trong Discord", 
+      FileName = "YoutubeHubKey1", -- Nên sử dụng một cái gì đó độc đáo vì các tập lệnh khác sử dụng Rayfield có thể ghi đè lên tệp khóa của bạn
+      SaveKey = true, -- Chuyển thành true để lưu key khi nhập không cần nhập lại nhưng khi đổi key thì sẽ không được lưu
+      GrabKeyFromSite = true, -- !Không quá quan trọng!
+      Key = {"Free_GEF"} -- Tạo key của bạn (ví dụ: 1234) hoặc có thể viết key của bạn vào link pastebin, github etc rồi dán vào 
+   }
+})
+
+
+
+
+
+
+local PlayerTab = Window:CreateTab("✡Player", nil) 
+local PlayerSection = PlayerTab:CreateSection("✡Player")
+
+-- esp player
+
+local espEnabled = false -- Trạng thái bật/tắt ESP
+local connections = {} -- Lưu các kết nối để ngắt khi cần
+
+local function createESP(player)
+    if player == game.Players.LocalPlayer then return end -- Không hiển thị bản thân
+
+    local function updateESP()
+        local character = player.Character
+        if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+        local billboard = Instance.new("BillboardGui")
+        billboard.Adornee = character.HumanoidRootPart
+        billboard.Size = UDim2.new(0, 200, 0, 50)
+        billboard.StudsOffset = Vector3.new(0, 3, 0)
+        billboard.AlwaysOnTop = true
+
+        local textLabel = Instance.new("TextLabel", billboard)
+        textLabel.Size = UDim2.new(1, 0, 1, 0)
+        textLabel.BackgroundTransparency = 1
+        textLabel.TextColor3 = Color3.new(0, 255, 0) -- Màu xanh lá
+        textLabel.TextScaled = false
+        textLabel.TextSize = 20
+        textLabel.Font = Enum.Font.SourceSansBold
+        textLabel.TextStrokeTransparency = 0.2
+        billboard.Parent = character.HumanoidRootPart
+
+        -- Cập nhật vị trí & giữ nguyên kích thước theo khoảng cách
+        spawn(function()
+            while espEnabled and character and character:FindFirstChild("Humanoid") and character:FindFirstChild("HumanoidRootPart") do
+                local humanoid = character:FindFirstChild("Humanoid")
+                local localPlayer = game.Players.LocalPlayer
+                if localPlayer and localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    local distance = (localPlayer.Character.HumanoidRootPart.Position - character.HumanoidRootPart.Position).Magnitude
+                    local size = 15
+                    billboard.Size = UDim2.new(0, size * 10, 0, size * 2)
+                    textLabel.Text = string.format("[%s] HP: %d | %dm", player.Name, math.floor(humanoid.Health), math.floor(distance))
+                end
+                wait(0.1)
+            end
+            billboard:Destroy()
+        end)
+    end
+
+    -- Gán ESP khi nhân vật mới spawn
+    if not connections[player] then
+        connections[player] = player.CharacterAdded:Connect(function()
+            if espEnabled then
+                wait(1) -- Đợi nhân vật load xong
+                updateESP()
+            end
+        end)
+    end
+
+    -- Nếu nhân vật đã tồn tại, tạo ESP luôn
+    if player.Character then
+        updateESP()
+    end
+end
+
+-- Hàm bật/tắt ESP
+local function toggleESP(Value)
+    espEnabled = Value -- Trạng thái toggle sẽ quyết định bật/tắt ESP
+
+    if espEnabled then
+        -- Thêm ESP cho tất cả người chơi hiện tại
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player ~= game.Players.LocalPlayer then
+                createESP(player)
+            end
+        end
+
+        -- Lắng nghe người chơi mới tham gia
+        connections["PlayerAdded"] = game.Players.PlayerAdded:Connect(function(player)
+            if espEnabled then createESP(player) end
+        end)
+    else
+        -- Xóa toàn bộ ESP khi tắt
+        for _, player in pairs(game.Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("HumanoidRootPart") then
+                for _, gui in pairs(player.Character.HumanoidRootPart:GetChildren()) do
+                    if gui:IsA("BillboardGui") then gui:Destroy() end
+                end
+            end
+        end
+
+        -- Ngắt tất cả kết nối
+        for _, conn in pairs(connections) do
+            if conn and typeof(conn) == "RBXScriptConnection" then
+                conn:Disconnect()
+            end
+        end
+        connections = {}
+    end
+end
+
+-- Tạo Tab và Toggle để bật/tắt ESP
+local Toggle = PlayerTab:CreateToggle({
+   Name = "ESP PLAYER",
+   CurrentValue = false,
+   Flag = "ESP_Toggle",  -- Cờ lưu trữ trạng thái toggle
+   Callback = function(Value)
+        toggleESP(Value)  -- Gọi hàm bật/tắt ESP khi toggle thay đổi
+   end,
+})
+
+
+
+
+-- Tốc độ
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local defaultSpeed = 16  -- Tốc độ mặc định
+local currentSpeed = defaultSpeed  -- Biến lưu tốc độ hiện tại
+
+-- Hàm thay đổi tốc độ đi bộ
+local function setWalkSpeed(speed)
+    if LocalPlayer and LocalPlayer.Character then
+        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Humanoid then
+            Humanoid.WalkSpeed = speed
+        end
+    end
+end
+
+-- Tăng tốc khi di chuyển trên mặt đất
+local function boostSpeedOnGround()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi di chuyển trên mặt đất
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Nhân vật đang di chuyển trên mặt đất, tăng tốc di chuyển
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                end
+            end
+        end
+    end)
+end
+
+-- Tăng tốc khi nhảy và di chuyển trong không khí
+local function boostSpeedInAir()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi nhảy
+                if Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                    -- Khi nhảy, vẫn cho phép di chuyển nhanh trong không khí
+                    RootPart.Velocity = Vector3.new(Humanoid.MoveDirection.X * currentSpeed, RootPart.Velocity.Y, Humanoid.MoveDirection.Z * currentSpeed)
+                end
+            end
+        end
+    end)
+end
+
+-- Tăng tốc khi đang chạy hoặc di chuyển trên mặt đất (thêm vào khi không có nhảy)
+local function boostSpeedWhileRunning()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái khi di chuyển
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Đảm bảo không bị giật và tăng tốc ổn định
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                end
+            end
+        end
+    end)
+end
+
+-- Tạo thanh chỉnh tốc độ
+local Slider = PlayerTab:CreateSlider({
+    Name = "Tốc Độ",
+    Range = {1, 500},  -- Giờ có thể chỉnh từ 1 đến 500
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,  -- Mặc định là 16
+    Flag = "sliderws", 
+    Callback = function(Value)
+        currentSpeed = Value
+        setWalkSpeed(currentSpeed)  -- Cập nhật tốc độ ngay lập tức
+    end,
+})
+
+-- Kích hoạt 3 hàm tăng tốc
+boostSpeedInAir()  -- Kích hoạt tăng tốc khi nhảy và di chuyển trên không khí
+boostSpeedOnGround()  -- Kích hoạt tăng tốc khi di chuyển trên mặt đất
+boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (trường hợp không nhảy)
+
+
+-- teleport vip
+
+local TeleportEnabled = false
+local TeleportScript = "https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/J97.txt"
+
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Dịch chuyển đến player",  -- Tên của nút
+   CurrentValue = false,  -- Mặc định tắt
+   Flag = "Teleport_Toggle",  -- Flag nhận diện toggle
+   Callback = function(Value)
+        TeleportEnabled = Value
+        if TeleportEnabled then
+            loadstring(game:HttpGet(TeleportScript))()  -- Tải và chạy script Fly khi bật
+        end
+   end,
+})
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+
+local noclipEnabled = false
+local noclipConnection
+
+-- Hàm bật/tắt noclip
+local function ToggleNoclip(value)
+    noclipEnabled = value
+
+    if noclipEnabled then
+        if noclipConnection then
+            noclipConnection:Disconnect()
+        end
+        
+        noclipConnection = RunService.Stepped:Connect(function()
+            if LocalPlayer.Character then
+                for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                    if part:IsA("BasePart") then
+                        part.CanCollide = false
+                    end
+                end
+            end
+        end)
+    else
+        if noclipConnection then
+            noclipConnection:Disconnect()
+            noclipConnection = nil
+        end
+    end
+end
+
+-- Tạo nút bật/tắt trong menu (Dùng đúng ScriptTab)
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Noclip",
+   CurrentValue = false,
+   Flag = "Noclip_Toggle",
+   Callback = function(Value)
+        ToggleNoclip(Value)
+   end,
+})
+
+
+
+
+
+
+
+-- Tạo GUI hiển thị tọa độ
+local player = game.Players.LocalPlayer
+local coordGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+coordGui.Name = "CoordDisplay"
+coordGui.Enabled = false  -- Mặc định ẩn
+
+local label = Instance.new("TextLabel", coordGui)
+label.Size = UDim2.new(0, 300, 0, 50)
+label.Position = UDim2.new(0, 10, 0, 10)
+label.BackgroundTransparency = 0.3
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.TextScaled = true
+label.Font = Enum.Font.SourceSansBold
+label.Text = "Tọa độ: Đang tải..."
+
+-- Cập nhật tọa độ mỗi frame
+game:GetService("RunService").RenderStepped:Connect(function()
+    if coordGui.Enabled then
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local pos = character.HumanoidRootPart.Position
+            label.Text = string.format("Tọa độ: X: %.1f | Y: %.1f | Z: %.1f", pos.X, pos.Y, pos.Z)
+        end
+    end
+end)
+
+-- Nút bật tắt
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Hiện Tọa Độ",
+   CurrentValue = false,
+   Flag = "CoordToggle",
+   Callback = function(Value)
+        coordGui.Enabled = Value
+   end,
+})
+
+
+
+
+
+
+
+local ItemTabWindow:CreateTab("☣Item", nil) 
+local ItemSection = ItemTab:CreateSection("☣Hop Item")
+
+
+-- hop item 
+
+local FoodButton = ItemTab:CreateButton({
+    Name = "Food",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Food.CFrame
+        print("Teleported to Food!")
+    end,
+})
+
+local SodaButton = ItemTab:CreateButton({
+    Name = "Soda",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Soda.CFrame
+        print("Teleported to Soda!")
+    end,
+})
+
+local MedkitButton = ItemTab:CreateButton({
+    Name = "Medkit",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Medkit.CFrame
+        print("Teleported to Medkit!")
+    end,
+})
+
+local BatButton = ItemTab:CreateButton({
+    Name = "Bat",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Bat.CFrame
+        print("Teleported to Bat!")
+    end,
+})
+
+local CrowbarButton = ItemTab:CreateButton({
+    Name = "Crowbar",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Crowbar.CFrame
+        print("Teleported to Crowbar!")
+    end,
+})
+
+local HandgunButton = ItemTab:CreateButton({
+    Name = "Handgun",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Handgun.CFrame
+        print("Teleported to Handgun!")
+    end,
+})
+
+local ShotgunButton = ItemTab:CreateButton({
+    Name = "Shotgun",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Shotgun.CFrame
+        print("Teleported to Shotgun!")
+    end,
+})
+
+local BulletsButton = ItemTab:CreateButton({
+    Name = "Bullets",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Bullets.CFrame
+        print("Teleported to Bullets!")
+    end,
+})
+
+local ShellsButton = ItemTab:CreateButton({
+    Name = "Shells",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Shells.CFrame
+        print("Teleported to Shells!")
+    end,
+})
+
+local HammerButton = ItemTab:CreateButton({
+    Name = "Hammer",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Hammer.CFrame
+        print("Teleported to Hammer!")
+    end,
+})
+
+local LanternButton = ItemTab:CreateButton({
+    Name = "Lantern",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Lantern.CFrame
+        print("Teleported to Lantern!")
+    end,
+})
+
+local GPSButton = ItemTab:CreateButton({
+    Name = "GPS",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.GPS.CFrame
+        print("Teleported to GPS!")
+    end,
+})
+
+local MoneyButton = ItemTab:CreateButton({
+    Name = "Money",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Money.CFrame
+        print("Teleported to Money!")
+    end,
+})
+
+
+
+
+local TeleportTab = Window:CreateTab("⛩️Teleport", nil) 
+local TeleportSection = TeleportTab:CreateSection("⛩️Teleport")
+
+
+local TeleportToShopButton1 = TeleportTab:CreateButton({
+    Name = "Đến Shop 1",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        -- Thay đổi tọa độ bạn muốn đến ở đây:
+        local targetCFrame = CFrame.new(198.0, -9.0, 15.0)
+
+        -- Dịch chuyển đến tọa độ
+        char:PivotTo(targetCFrame)
+    end,
+})
+
+
+local TeleportToShopButton2 = TeleportTab:CreateButton({
+    Name = "Đến Shop 2",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        -- Thay đổi tọa độ bạn muốn đến ở đây:
+        local targetCFrame = CFrame.new(297.5, -9.0, 506.4)
+
+        -- Dịch chuyển đến tọa độ
+        char:PivotTo(targetCFrame)
+    end,
+})
+
+
+local TeleportToShopButton3 = TeleportTab:CreateButton({
+    Name = "Đến Shop 3",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        -- Thay đổi tọa độ bạn muốn đến ở đây:
+        local targetCFrame = CFrame.new(139.8, -9.0, -407.3)
+
+        -- Dịch chuyển đến tọa độ
+        char:PivotTo(targetCFrame)
+    end,
+})
+
+
+local TeleportToShopButton4 = TeleportTab:CreateButton({
+    Name = "Đến Shop 4",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
+
+        -- Thay đổi tọa độ bạn muốn đến ở đây:
+        local targetCFrame = CFrame.new(-412.0, -9.0, 57.3)
+
+        -- Dịch chuyển đến tọa độ
+        char:PivotTo(targetCFrame)
+    end,
+})
+
+
+
+
+local GEFTab = Window:CreateTab("⚛GEF", nil) 
+local GEFSection = GEFTab:CreateSection("⚛GEF")
+
+
+-- anti gef
+
+-- Script xử lý Anti GEF
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function pushOrDestroyGEF()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Hurtbox" then
+            local gef = obj
+            local distance = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+
+            if distance <= 999999 then
+                -- Thử đẩy ra xa
+                local success, err = pcall(function()
+                    gef.Velocity = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Unit * 9999999999
+                end)
+
+                -- Nếu không thể đẩy, tiêu diệt GEF
+                if not success then
+                    pcall(function()
+                        gef.Parent:Destroy()
+                    end)
+                end
+            end
+        end
+    end
+end
+
+local AntiGEF_Active = false
+
+-- Tạo nút bật tắt cuối code
+task.delay(0.5, function()
+    local Toggle = GEFTab:CreateToggle({
+        Name = "Anti GEF",
+        CurrentValue = false,
+        Flag = "GEF_Toggle", 
+        Callback = function(Value)
+            AntiGEF_Active = Value
+        end,
+    })
+
+    RunService.Heartbeat:Connect(function()
+        if AntiGEF_Active then
+            pushOrDestroyGEF()
+        end
+    end)
+end)
