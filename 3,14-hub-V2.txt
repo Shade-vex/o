@@ -299,6 +299,49 @@ local Toggle = PlayerTab:CreateToggle({
    end,
 })
 
+
+
+
+
+
+
+-- Tạo GUI hiển thị tọa độ
+local player = game.Players.LocalPlayer
+local coordGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+coordGui.Name = "CoordDisplay"
+coordGui.Enabled = false  -- Mặc định ẩn
+
+local label = Instance.new("TextLabel", coordGui)
+label.Size = UDim2.new(0, 300, 0, 50)
+label.Position = UDim2.new(0, 10, 0, 10)
+label.BackgroundTransparency = 0.3
+label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+label.TextColor3 = Color3.fromRGB(255, 255, 255)
+label.TextScaled = true
+label.Font = Enum.Font.SourceSansBold
+label.Text = "Tọa độ: Đang tải..."
+
+-- Cập nhật tọa độ mỗi frame
+game:GetService("RunService").RenderStepped:Connect(function()
+    if coordGui.Enabled then
+        local character = player.Character
+        if character and character:FindFirstChild("HumanoidRootPart") then
+            local pos = character.HumanoidRootPart.Position
+            label.Text = string.format("Tọa độ: X: %.1f | Y: %.1f | Z: %.1f", pos.X, pos.Y, pos.Z)
+        end
+    end
+end)
+
+-- Nút bật tắt
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Hiện Tọa Độ",
+   CurrentValue = false,
+   Flag = "CoordToggle",
+   Callback = function(Value)
+        coordGui.Enabled = Value
+   end,
+})
+
 local ItemTab = Window:CreateTab("☣Item", nil) 
 local ItemSection = ItemTab:CreateSection("☣Hop Item")
 
