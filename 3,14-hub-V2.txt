@@ -488,7 +488,7 @@ local TeleportToShopButton1 = TeleportTab:CreateButton({
 })
 
 
-local TeleportToShopButton2 = ItemTab:CreateButton({
+local TeleportToShopButton2 = TeleportTab:CreateButton({
     Name = "Đến Shop 2",
     Callback = function()
         local player = game.Players.LocalPlayer
@@ -504,7 +504,7 @@ local TeleportToShopButton2 = ItemTab:CreateButton({
 })
 
 
-local TeleportToShopButton3 = ItemTab:CreateButton({
+local TeleportToShopButton3 = TeleportTab:CreateButton({
     Name = "Đến Shop 3",
     Callback = function()
         local player = game.Players.LocalPlayer
@@ -520,7 +520,7 @@ local TeleportToShopButton3 = ItemTab:CreateButton({
 })
 
 
-local TeleportToShopButton4 = ItemTab:CreateButton({
+local TeleportToShopButton4 = TeleportTab:CreateButton({
     Name = "Đến Shop 4",
     Callback = function()
         local player = game.Players.LocalPlayer
