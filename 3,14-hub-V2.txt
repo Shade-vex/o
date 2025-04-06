@@ -1,7 +1,7 @@
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 
 local Window = Rayfield:CreateWindow({
-   Name = "🔰 Maru hub [Premium] | GEF 🔰", -- Tên hub của bạn trong menu
+   Name = "🔰 Maru hub [Premium] 🔰", -- Tên hub của bạn trong menu
    LoadingTitle = "🔰 Maru hub [Premium] 🔰", -- Tên hub của bạn trong khi load
    LoadingSubtitle = "by Kzu123",
    ConfigurationSaving = {
@@ -25,6 +25,76 @@ local Window = Rayfield:CreateWindow({
       Key = {"Free_GEF"} -- Tạo key của bạn (ví dụ: 1234) hoặc có thể viết key của bạn vào link pastebin, github etc rồi dán vào 
    }
 })
+
+
+
+
+
+
+local PlayerTab = Window:CreateTab("✡Player", nil) 
+local PlayerSection = PlayerTab:CreateSection("✡Player")
+
+
+
+local Players = game:GetService("Players")
+local playerNames = {} -- danh sách tên người chơi
+
+-- Nút cập nhật danh sách player
+local UpdatePlayerListButton = PlayerTab:CreateButton({
+    Name = "Cập nhật Player",
+    Callback = function()
+        playerNames = {}
+        for _, plr in pairs(Players:GetPlayers()) do
+            if plr ~= Players.LocalPlayer then
+                table.insert(playerNames, plr.Name)
+            end
+        end
+
+        if #playerNames == 0 then
+            table.insert(playerNames, "Không có người chơi nào")
+        end
+
+        print("Đã cập nhật danh sách người chơi!")
+    end,
+})
+
+-- Dropdown chọn player
+local SelectedPlayer = nil
+
+local PlayerDropdown = PlayerTab:CreateDropdown({
+    Name = "Chọn Player",
+    Options = playerNames,
+    CurrentOption = {},
+    MultipleOptions = false,
+    Flag = "selected_player_dropdown",
+    Callback = function(Option)
+        SelectedPlayer = Option
+        print("Đã chọn: " .. Option)
+    end,
+})
+
+-- Nút dịch chuyển đến player đã chọn
+local TeleportToPlayer = PlayerTab:CreateButton({
+    Name = "Dịch chuyển",
+    Callback = function()
+        if not SelectedPlayer or SelectedPlayer == "Không có người chơi nào" then
+            warn("Chưa chọn người chơi hợp lệ.")
+            return
+        end
+
+        local localPlayer = Players.LocalPlayer
+        local rootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local targetPlayer = Players:FindFirstChild(SelectedPlayer)
+
+        if rootPart and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            rootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(2, 0, 0)
+            print("Dịch chuyển đến: " .. SelectedPlayer)
+        else
+            warn("Không thể dịch chuyển tới player.")
+        end
+    end,
+})
+
 
 
 
