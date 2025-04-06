@@ -1,0 +1,65 @@
+local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
+
+local Window = Rayfield:CreateWindow({
+   Name = "🔰 Maru hub [Premium] | GEF 🔰", -- Tên hub của bạn trong menu
+   LoadingTitle = "🔰 Maru hub [Premium] 🔰", -- Tên hub của bạn trong khi load
+   LoadingSubtitle = "by Kzu123",
+   ConfigurationSaving = {
+      Enabled = false,
+      FolderName = nil, -- Tạo thư mục tùy chỉnh cho hub/game của bạn
+      FileName = "Example Hub"
+   },
+   Discord = {
+      Enabled = false,
+      Invite = "noinvitelink", -- Link mời vào Discord của bạn hoặc thứ khác
+      RememberJoins = true -- Chỉnh thành false để họ tham gia Discord hoặc thứ khác
+   },
+   KeySystem = true, -- Chuyển thành true để tạo gui nhập key và false để tắt gui
+   KeySettings = {
+      Title = "Maru hub [Premium]", -- Tên 
+      Subtitle = "Nhập key tại đây.", -- chú thích
+      Note = "Key ở trong Discord", 
+      FileName = "YoutubeHubKey1", -- Nên sử dụng một cái gì đó độc đáo vì các tập lệnh khác sử dụng Rayfield có thể ghi đè lên tệp khóa của bạn
+      SaveKey = true, -- Chuyển thành true để lưu key khi nhập không cần nhập lại nhưng khi đổi key thì sẽ không được lưu
+      GrabKeyFromSite = true, -- !Không quá quan trọng!
+      Key = {"Free_GEF"} -- Tạo key của bạn (ví dụ: 1234) hoặc có thể viết key của bạn vào link pastebin, github etc rồi dán vào 
+   }
+})
+
+
+
+
+local ItemTab = Window:CreateTab("☣Item", nil) 
+local ItemSection = ItemTab:CreateSection("☣Hop Item")
+
+
+-- hop item 
+
+local FoodButton = ItemTab:CreateButton({
+    Name = "Food",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Food.CFrame
+        print("Teleported to Food!")
+    end,
+})
+
+local SodaButton = ItemTab:CreateButton({
+    Name = "Soda",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Soda.CFrame
+        print("Teleported to Soda!")
+    end,
+})
+
+local MedkitButton = ItemTab:CreateButton({
+    Name = "Medkit",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Medkit.CFrame
+        print("Teleported to Medkit!")
+    end,
+})
+
+
