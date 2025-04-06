@@ -37,65 +37,61 @@ local PlayerSection = PlayerTab:CreateSection("✡Player")
 
 
 local Players = game:GetService("Players")
-local playerNames = {} -- danh sách tên người chơi
+local LocalPlayer = Players.LocalPlayer
 
--- Nút cập nhật danh sách player
+-- Biến cục bộ để tránh xung đột
+local selectedPlayer = nil
+local playerList = {}
+local playerDropdown -- Biến lưu dropdown
+
+-- Hàm cập nhật danh sách người chơi
+local function updatePlayerList()
+    playerList = {} -- Xóa danh sách cũ
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    if playerDropdown then
+        playerDropdown:SetOptions(playerList) -- Cập nhật dropdown với danh sách mới
+    end
+end
+
+updatePlayerList()
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+-- Nút cập nhật danh sách người chơi trong Tab7o
 local UpdatePlayerListButton = PlayerTab:CreateButton({
     Name = "Cập nhật",
     Callback = function()
-        playerNames = {}
-        for _, plr in pairs(Players:GetPlayers()) do
-            if plr ~= Players.LocalPlayer then
-                table.insert(playerNames, plr.Name)
-            end
-        end
-
-        -- Nếu không có player khác ngoài bản thân, thông báo
-        if #playerNames == 0 then
-            table.insert(playerNames, "Không có người chơi nào")
-        end
-
-        print("Đã cập nhật danh sách người chơi!")
-        print("Danh sách player: ", table.concat(playerNames, ", "))
-        
-        -- Cập nhật lại Dropdown
-        PlayerDropdown:SetOptions(playerNames)
+        updatePlayerList() -- Cập nhật danh sách player
+        print("Danh sách player đã được cập nhật.")
     end,
 })
 
--- Dropdown chọn player
-local SelectedPlayer = nil
-
-local PlayerDropdown = PlayerTab:CreateDropdown({
-    Name = "Chọn Player",
-    Options = playerNames,
+-- Dropdown danh sách người chơi trong Tab7o
+playerDropdown = PlayerTab:CreateDropdown({
+    Name = "Các player",
+    Options = playerList,
     CurrentOption = {},
     MultipleOptions = false,
-    Flag = "selected_player_dropdown",
-    Callback = function(Option)
-        SelectedPlayer = Option
-        print("Đã chọn: " .. Option)
+    Flag = "dropdownplayer",
+    Callback = function(selected)
+        selectedPlayer = Players:FindFirstChild(selected)
+        print("Đã chọn: " .. selected) -- In ra tên người chơi đã chọn
     end,
 })
 
--- Nút dịch chuyển đến player đã chọn
-local TeleportToPlayer = PlayerTab:CreateButton({
+-- Nút dịch chuyển đến người chơi đã chọn trong Tab7o
+local TeleportToPlayerButton = PlayerTab:CreateButton({
     Name = "Dịch chuyển",
     Callback = function()
-        if not SelectedPlayer or SelectedPlayer == "Không có người chơi nào" then
-            warn("Chưa chọn người chơi hợp lệ.")
-            return
-        end
-
-        local localPlayer = Players.LocalPlayer
-        local rootPart = localPlayer.Character and localPlayer.Character:FindFirstChild("HumanoidRootPart")
-        local targetPlayer = Players:FindFirstChild(SelectedPlayer)
-
-        if rootPart and targetPlayer and targetPlayer.Character and targetPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            rootPart.CFrame = targetPlayer.Character.HumanoidRootPart.CFrame + Vector3.new(2, 0, 0)
-            print("Dịch chuyển đến: " .. SelectedPlayer)
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+            print("Dịch chuyển đến: " .. selectedPlayer.Name)
         else
-            warn("Không thể dịch chuyển tới player.")
+            warn("Không thể dịch chuyển! Người chơi không hợp lệ hoặc đã rời game.")
         end
     end,
 })
@@ -217,4 +213,3 @@ local MoneyButton = ItemTab:CreateButton({
         print("Teleported to Money!")
     end,
 })
-
