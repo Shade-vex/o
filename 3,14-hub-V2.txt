@@ -134,7 +134,7 @@ local TeleportEnabled = false
 local TeleportScript = "https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/J97.txt"
 
 local Toggle = PlayerTab:CreateToggle({
-   Name = "Fly [VIP]",  -- Tên của nút
+   Name = "Dịch chuyển đến player",  -- Tên của nút
    CurrentValue = false,  -- Mặc định tắt
    Flag = "Teleport_Toggle",  -- Flag nhận diện toggle
    Callback = function(Value)
@@ -212,6 +212,15 @@ local ShotgunButton = ItemTab:CreateButton({
         local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
         rootPart.CFrame = game:GetService("Workspace").Pickups.Shotgun.CFrame
         print("Teleported to Shotgun!")
+    end,
+})
+
+local BulletsButton = ItemTab:CreateButton({
+    Name = "Bullets",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Bullets.CFrame
+        print("Teleported to Bullets!")
     end,
 })
 
