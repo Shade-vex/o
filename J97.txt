@@ -22,7 +22,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
   })
 
        MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=94454005330615",
+       Image = "http://www.roblox.com/asset/?id=102423727586783",
        Size = {50, 50},
        Color = Color3.fromRGB(10, 10, 10),
        Corner = true,
