@@ -33,7 +33,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
 ------ Tab
      local Tab1o = MakeTab({Name = "Teleport"})
 
-   Section = AddSection(Tab7o, {"Dịch chuyển V1"})          
+   Section = AddSection(Tab1o, {"Dịch chuyển V1"})          
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
