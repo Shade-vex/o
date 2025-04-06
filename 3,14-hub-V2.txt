@@ -355,10 +355,10 @@ local function pushOrDestroyGEF()
             local gef = obj
             local distance = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
 
-            if distance <= 50 then
+            if distance <= 500 then
                 -- Thử đẩy ra xa
                 local success, err = pcall(function()
-                    gef.Velocity = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Unit * 1000
+                    gef.Velocity = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Unit * 1000000000
                 end)
 
                 -- Nếu không thể đẩy, tiêu diệt GEF
@@ -375,7 +375,7 @@ end
 local AntiGEF_Active = false
 
 -- Tạo nút bật tắt cuối code
-task.delay(0.5, function()
+task.delay(0.1, function()
     local Toggle = PlayerTab:CreateToggle({
         Name = "Anti GEF",
         CurrentValue = false,
