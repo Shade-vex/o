@@ -36,64 +36,96 @@ local PlayerSection = PlayerTab:CreateSection("✡Player")
 
 
 
+-- Tốc độ
 
 local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
 local LocalPlayer = Players.LocalPlayer
+local defaultSpeed = 16  -- Tốc độ mặc định
+local currentSpeed = defaultSpeed  -- Biến lưu tốc độ hiện tại
 
--- Biến cục bộ để tránh xung đột
-local selectedPlayer = nil
-local playerList = {}
-local playerDropdown -- Biến lưu dropdown
-
--- Hàm cập nhật danh sách người chơi
-local function updatePlayerList()
-    playerList = {} -- Xóa danh sách cũ
-    for _, player in ipairs(Players:GetPlayers()) do
-        if player ~= LocalPlayer then
-            table.insert(playerList, player.Name)
+-- Hàm thay đổi tốc độ đi bộ
+local function setWalkSpeed(speed)
+    if LocalPlayer and LocalPlayer.Character then
+        local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if Humanoid then
+            Humanoid.WalkSpeed = speed
         end
-    end
-    -- Cập nhật dropdown nếu nó đã được tạo
-    if playerDropdown then
-        playerDropdown:SetOptions(playerList) -- Cập nhật dropdown với danh sách mới
     end
 end
 
--- Cập nhật ngay khi script chạy
-updatePlayerList()
+-- Tăng tốc khi di chuyển trên mặt đất
+local function boostSpeedOnGround()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
 
--- Cập nhật danh sách khi có player mới vào hoặc rời
-Players.PlayerAdded:Connect(updatePlayerList)
-Players.PlayerRemoving:Connect(updatePlayerList)
-
--- Dropdown danh sách người chơi trong Tab7o
-playerDropdown = PlayerTab:CreateDropdown({
-    Name = "Danh sách Player",
-    Options = playerList,
-    CurrentOption = {},
-    MultipleOptions = false,
-    Flag = "dropdownplayer",
-    Callback = function(selected)
-        -- Kiểm tra xem player đã chọn có tồn tại trong game không và đảm bảo selected không rỗng
-        if selected and selected ~= "" then
-            selectedPlayer = Players:FindFirstChild(selected)
-            if selectedPlayer then
-                -- Nếu đã chọn player hợp lệ, thực hiện dịch chuyển ngay lập tức
-                if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                    -- Dịch chuyển đến vị trí của player đó
-                    LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
-                    print("Dịch chuyển đến: " .. selectedPlayer.Name)
-                else
-                    warn("Lỗi: Người chơi không có nhân vật hoặc nhân vật không hợp lệ.")
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi di chuyển trên mặt đất
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Nhân vật đang di chuyển trên mặt đất, tăng tốc di chuyển
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
                 end
-            else
-                warn("Không tìm thấy player: " .. selected)
             end
-        else
-            warn("Vui lòng chọn player hợp lệ từ danh sách.")
         end
+    end)
+end
+
+-- Tăng tốc khi nhảy và di chuyển trong không khí
+local function boostSpeedInAir()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái của nhân vật khi nhảy
+                if Humanoid:GetState() == Enum.HumanoidStateType.Freefall then
+                    -- Khi nhảy, vẫn cho phép di chuyển nhanh trong không khí
+                    RootPart.Velocity = Vector3.new(Humanoid.MoveDirection.X * currentSpeed, RootPart.Velocity.Y, Humanoid.MoveDirection.Z * currentSpeed)
+                end
+            end
+        end
+    end)
+end
+
+-- Tăng tốc khi đang chạy hoặc di chuyển trên mặt đất (thêm vào khi không có nhảy)
+local function boostSpeedWhileRunning()
+    RunService.RenderStepped:Connect(function()
+        if LocalPlayer and LocalPlayer.Character then
+            local Humanoid = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+            local RootPart = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+
+            if RootPart and Humanoid then
+                -- Kiểm tra trạng thái khi di chuyển
+                if Humanoid.MoveDirection.Magnitude > 0 and Humanoid:GetState() == Enum.HumanoidStateType.Physics then
+                    -- Đảm bảo không bị giật và tăng tốc ổn định
+                    RootPart.Velocity = Humanoid.MoveDirection * currentSpeed
+                end
+            end
+        end
+    end)
+end
+
+-- Tạo thanh chỉnh tốc độ
+local Slider = PlayerTab:CreateSlider({
+    Name = "Tốc Độ",
+    Range = {1, 500},  -- Giờ có thể chỉnh từ 1 đến 500
+    Increment = 1,
+    Suffix = "Speed",
+    CurrentValue = 16,  -- Mặc định là 16
+    Flag = "sliderws", 
+    Callback = function(Value)
+        currentSpeed = Value
+        setWalkSpeed(currentSpeed)  -- Cập nhật tốc độ ngay lập tức
     end,
 })
+
+-- Kích hoạt 3 hàm tăng tốc
+boostSpeedInAir()  -- Kích hoạt tăng tốc khi nhảy và di chuyển trên không khí
+boostSpeedOnGround()  -- Kích hoạt tăng tốc khi di chuyển trên mặt đất
+boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (trường hợp không nhảy)
 
 
 
