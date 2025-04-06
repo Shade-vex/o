@@ -34,7 +34,7 @@ local Window = Rayfield:CreateWindow({
 local PlayerTab = Window:CreateTab("✡Player", nil) 
 local PlayerSection = PlayerTab:CreateSection("✡Player")
 
-esp player
+-- esp player
 
 local espEnabled = false -- Trạng thái bật/tắt ESP
 local connections = {} -- Lưu các kết nối để ngắt khi cần
