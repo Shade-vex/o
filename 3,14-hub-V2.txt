@@ -342,6 +342,64 @@ local Toggle = PlayerTab:CreateToggle({
    end,
 })
 
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
+local Workspace = game:GetService("Workspace")
+
+local AntiGEF_Enabled = false
+
+-- Hàm đẩy hoặc tiêu diệt GEF
+local function repelOrDestroyGEF()
+    local character = LocalPlayer.Character
+    if not character or not character:FindFirstChild("HumanoidRootPart") then return end
+
+    local root = character:FindFirstChild("HumanoidRootPart")
+
+    for _, obj in ipairs(Workspace:GetDescendants()) do
+        if obj:IsA("Model") and obj.Name:lower() == "gef" and obj:FindFirstChild("HumanoidRootPart") then
+            local gefRoot = obj.HumanoidRootPart
+            local distance = (root.Position - gefRoot.Position).Magnitude
+
+            if distance < 50 then -- Nếu gef đến gần
+                local direction = (gefRoot.Position - root.Position).Unit
+                local repelPos = gefRoot.Position + direction * 1000
+
+                -- Cố gắng đẩy
+                local success = pcall(function()
+                    gefRoot.CFrame = CFrame.new(repelPos)
+                end)
+
+                -- Nếu không thể đẩy thì tiêu diệt gef
+                if not success and obj:FindFirstChildOfClass("Humanoid") then
+                    obj:FindFirstChildOfClass("Humanoid").Health = 0
+                end
+            end
+        end
+    end
+end
+
+-- Kích hoạt theo thời gian
+RunService.Heartbeat:Connect(function()
+    if AntiGEF_Enabled then
+        pcall(repelOrDestroyGEF)
+    end
+end)
+
+-- Nút bật/tắt đặt ở cuối cùng để tránh lỗi Callback
+local Toggle = PlayerTab:CreateToggle({
+    Name = "Anti GEF",
+    CurrentValue = false,
+    Flag = "GEF_Toggle",
+    Callback = function(Value)
+        AntiGEF_Enabled = Value
+    end,
+})
+
+
+
 local ItemTab = Window:CreateTab("☣Item", nil) 
 local ItemSection = ItemTab:CreateSection("☣Hop Item")
 
