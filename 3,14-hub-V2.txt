@@ -469,7 +469,7 @@ local MoneyButton = ItemTab:CreateButton({
 
 
 local TeleportTab = Window:CreateTab("⛩️Teleport", nil) 
-local TeleportSection = ShopTab:CreateSection("⛩️Teleport")
+local TeleportSection = TeleportTab:CreateSection("⛩️Teleport")
 
 
 local TeleportToShopButton1 = TeleportTab:CreateButton({
