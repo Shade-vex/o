@@ -52,18 +52,22 @@ local function updatePlayerList()
             table.insert(playerList, player.Name)
         end
     end
+    -- Cập nhật dropdown nếu nó đã được tạo
     if playerDropdown then
         playerDropdown:SetOptions(playerList) -- Cập nhật dropdown với danh sách mới
     end
 end
 
+-- Cập nhật ngay khi script chạy
 updatePlayerList()
+
+-- Cập nhật danh sách khi có player mới vào hoặc rời
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
 
 -- Nút cập nhật danh sách người chơi trong Tab7o
-local UpdatePlayerListButton = PlayerTab:CreateButton({
-    Name = "Cập nhật",
+PlayerTab:CreateButton({
+    Name = "Cập nhật danh sách",
     Callback = function()
         updatePlayerList() -- Cập nhật danh sách player
         print("Danh sách player đã được cập nhật.")
@@ -72,26 +76,37 @@ local UpdatePlayerListButton = PlayerTab:CreateButton({
 
 -- Dropdown danh sách người chơi trong Tab7o
 playerDropdown = PlayerTab:CreateDropdown({
-    Name = "Các player",
+    Name = "Danh sách Player",
     Options = playerList,
     CurrentOption = {},
     MultipleOptions = false,
     Flag = "dropdownplayer",
     Callback = function(selected)
+        -- Kiểm tra xem player đã chọn có tồn tại trong game không
         selectedPlayer = Players:FindFirstChild(selected)
-        print("Đã chọn: " .. selected) -- In ra tên người chơi đã chọn
+        if selectedPlayer then
+            print("Đã chọn: " .. selectedPlayer.Name) -- In ra tên người chơi đã chọn
+        else
+            print("Không tìm thấy player: " .. selected)
+        end
     end,
 })
 
 -- Nút dịch chuyển đến người chơi đã chọn trong Tab7o
-local TeleportToPlayerButton = PlayerTab:CreateButton({
-    Name = "Dịch chuyển",
+PlayerTab:CreateButton({
+    Name = "Dịch chuyển đến",
     Callback = function()
-        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
-            print("Dịch chuyển đến: " .. selectedPlayer.Name)
+        -- Kiểm tra xem đã chọn player chưa và player có nhân vật hợp lệ không
+        if selectedPlayer then
+            if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                -- Dịch chuyển đến HumanoidRootPart của player
+                LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+                print("Dịch chuyển đến: " .. selectedPlayer.Name)
+            else
+                print("Lỗi: Người chơi không có nhân vật hoặc nhân vật không hợp lệ.")
+            end
         else
-            warn("Không thể dịch chuyển! Người chơi không hợp lệ hoặc đã rời game.")
+            print("Lỗi: Chưa chọn người chơi trong dropdown.")
         end
     end,
 })
