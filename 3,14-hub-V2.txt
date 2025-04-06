@@ -349,7 +349,7 @@ local ItemSection = ItemTab:CreateSection("☣Hop Item")
 -- hop item 
 
 
-local Button1 = ItemTab:CreateButton({
+local TeleportToShopButton = ItemTab:CreateButton({
     Name = "Đến Shop",
     Callback = function()
         local player = game.Players.LocalPlayer
