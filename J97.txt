@@ -1,0 +1,188 @@
+
+loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/refs/heads/main/menu-for-you-hub.txt")))()
+
+       local Window = MakeWindow({
+         Hub = {
+         Title = "Maru hub [Premium]",
+         Animation = "By: Kzu123"
+         },
+        Key = {
+        KeySystem = fasle,
+        Title = "Valor Vex V0.1.3",
+        Description = "đăng kí cho Shade-Vex đi",
+        KeyLink = "https://discord.gg/DmN8sE7Y",
+        Keys = {"Premium_Key_29833z920j8"},
+        Notifi = {
+        Notifications = true,
+        CorrectKey = "Đang chạy script...",
+       Incorrectkey = "Key không tồn tại",
+       CopyKeyLink = "Đã sao chép link",
+      }
+    }
+  })
+
+       MinimizeButton({
+       Image = "http://www.roblox.com/asset/?id=102423727586783",
+       Size = {50, 50},
+       Color = Color3.fromRGB(10, 10, 10),
+       Corner = true,
+       Stroke = false,
+       StrokeColor = Color3.fromRGB(255, 0, 0)
+      })
+      
+------ Tab
+     local Tab1o = MakeTab({Name = "Teleport"})
+
+   Section = AddSection(Tab7o, {"Dịch chuyển V1"})          
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+-- Biến cục bộ để tránh xung đột
+local selectedPlayer = nil
+local playerList = {}
+local playerDropdown -- Biến lưu dropdown
+
+-- Hàm cập nhật danh sách người chơi
+local function updatePlayerList()
+    playerList = {} -- Xóa danh sách cũ
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerList, player.Name)
+        end
+    end
+    if playerDropdown then
+        playerDropdown:SetOptions(playerList) -- Cập nhật dropdown với danh sách mới
+    end
+end
+
+updatePlayerList()
+Players.PlayerAdded:Connect(updatePlayerList)
+Players.PlayerRemoving:Connect(updatePlayerList)
+
+-- Nút cập nhật danh sách người chơi trong Tab7o
+AddButton(Tab1o, {
+    Name = "Cập Nhật Danh Sách",
+    Callback = function()
+        updatePlayerList()
+    end
+})
+
+-- Dropdown danh sách người chơi trong Tab7o
+playerDropdown = AddDropdown(Tab1o, {
+    Name = "Danh Sách Player",
+    Options = playerList,
+    Callback = function(selected)
+        selectedPlayer = Players:FindFirstChild(selected)
+    end
+})
+
+-- Nút dịch chuyển đến người chơi đã chọn trong Tab7o
+AddButton(Tab1o, {
+    Name = "Dịch Chuyển",
+    Callback = function()
+        if selectedPlayer and selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+        else
+            warn("Không thể dịch chuyển! Người chơi không hợp lệ hoặc đã rời game.")
+        end
+    end
+})
+
+
+
+   Section = AddSection(Tab1o, {"Dịch chuyển V2"})          
+
+
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService("RunService")
+
+-- Biến cục bộ để tránh xung đột
+local selectedPlayerV2 = nil
+local playerListV2 = {}
+_G.FlyingV2 = false
+
+-- Hàm cập nhật danh sách người chơi
+local function updatePlayerListV2()
+    table.clear(playerListV2) -- Xóa danh sách cũ để tránh trùng lặp
+    for _, player in ipairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer then
+            table.insert(playerListV2, player.Name)
+        end
+    end
+    if playerDropdownV2 then
+        playerDropdownV2:SetOptions(playerListV2) -- Cập nhật dropdown với danh sách mới
+    end
+end
+
+updatePlayerListV2()
+Players.PlayerAdded:Connect(updatePlayerListV2)
+Players.PlayerRemoving:Connect(updatePlayerListV2)
+
+-- Nút cập nhật danh sách người chơi (Để lên đầu)
+AddButton(Tab1o, {
+    Name = "Cập Nhật Danh Sách V2",
+    Callback = function()
+        updatePlayerListV2()
+    end
+})
+
+-- Dropdown danh sách người chơi
+playerDropdownV2 = AddDropdown(Tab1o, {
+    Name = "Danh Sách Player V2",
+    Options = playerListV2,
+    Callback = function(selected)
+        selectedPlayerV2 = Players:FindFirstChild(selected)
+    end
+})
+
+-- **🚀 Dịch Chuyển V2 (Bay & Xuyên Tường)**
+local function teleportToPlayerV2()
+    if selectedPlayerV2 and selectedPlayerV2.Character and selectedPlayerV2.Character:FindFirstChild("HumanoidRootPart") then
+        local hrp = LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        local targetHrp = selectedPlayerV2.Character:FindFirstChild("HumanoidRootPart")
+
+        if hrp and targetHrp then
+            _G.FlyingV2 = true -- Bật chế độ bay
+
+            -- Xuyên tường khi di chuyển
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = false
+                end
+            end
+
+            -- Tween bay đến mục tiêu
+            local tweenService = game:GetService("TweenService")
+            local tweenInfo = TweenInfo.new((hrp.Position - targetHrp.Position).Magnitude / 300, Enum.EasingStyle.Linear)
+            local tween = tweenService:Create(hrp, tweenInfo, {CFrame = targetHrp.CFrame})
+
+            tween:Play()
+            tween.Completed:Wait() -- Chờ đến nơi thì dừng bay
+
+            _G.FlyingV2 = false -- Tắt chế độ bay
+
+            -- Khôi phục va chạm sau khi dịch chuyển xong
+            for _, part in pairs(LocalPlayer.Character:GetDescendants()) do
+                if part:IsA("BasePart") then
+                    part.CanCollide = true
+                end
+            end
+        end
+    else
+        warn("Không thể dịch chuyển! Người chơi không hợp lệ hoặc đã rời game.")
+    end
+end
+
+-- Nút dịch chuyển đến người chơi đã chọn (V2)
+AddButton(Tab1o, {
+    Name = "Dịch Chuyển V2",
+    Callback = function()
+        teleportToPlayerV2()
+    end
+})
+
+
+
+
