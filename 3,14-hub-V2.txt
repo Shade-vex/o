@@ -604,79 +604,100 @@ end)
 
 -- esp gef
 
--- Đảm bảo rằng bạn đã có GEFTab trước khi tạo Toggle
-local GEFTab = -- Tab nơi chứa nút (giả sử bạn đã tạo GEFTab ở nơi khác trong mã)
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local LocalPlayer = Players.LocalPlayer
 
--- Biến để kiểm tra trạng thái ESP
-local espEnabled = false -- Mặc định ESP tắt
+local espEnabled = false
+local espParts = {}
 
--- ฟังก์ชันสำหรับสร้าง ESP สำหรับ Hurtbox
-local function createESPForHurtbox(part)
-    local espGui = Instance.new("BillboardGui", part)
+-- Hàm tạo BillboardGui cho Hurtbox
+local function createESP(part)
+    if part:FindFirstChild("GEF_ESP") then return end
+
+    local espGui = Instance.new("BillboardGui")
+    espGui.Name = "GEF_ESP"
     espGui.Adornee = part
     espGui.Size = UDim2.new(0, 200, 0, 50)
     espGui.AlwaysOnTop = true
     espGui.StudsOffset = Vector3.new(0, 3, 0)
-    
+    espGui.Parent = part
+
     local nameLabel = Instance.new("TextLabel", espGui)
+    nameLabel.Name = "NameLabel"
     nameLabel.Text = "GEF"
     nameLabel.BackgroundTransparency = 1
     nameLabel.Size = UDim2.new(0, 200, 0, 20)
     nameLabel.Font = Enum.Font.SourceSansBold
     nameLabel.TextSize = 18
-    
+
     local distanceLabel = Instance.new("TextLabel", espGui)
+    distanceLabel.Name = "DistanceLabel"
     distanceLabel.BackgroundTransparency = 1
     distanceLabel.Size = UDim2.new(0, 200, 0, 20)
+    distanceLabel.Position = UDim2.new(0, 0, 0, 20)
     distanceLabel.Font = Enum.Font.SourceSansBold
     distanceLabel.TextSize = 18
-    distanceLabel.Position = UDim2.new(0, 0, 0, 20)
-    
-    -- อัปเดตระยะห่างและสีข้อความ
-    game:GetService("RunService").RenderStepped:Connect(function()
-        local distance = (game.Players.LocalPlayer.Character.HumanoidRootPart.Position - part.Position).magnitude
-        distanceLabel.Text = string.format("Distance: %.2f", distance)
-        
-        if distance < 50 then
-            nameLabel.TextColor3 = Color3.new(1, 0.5, 0)
-            distanceLabel.TextColor3 = Color3.new(1, 0.5, 0)
-        elseif distance < 100 then
-            nameLabel.TextColor3 = Color3.new(1, 1, 0)
-            distanceLabel.TextColor3 = Color3.new(1, 1, 0)
-        else
-            nameLabel.TextColor3 = Color3.new(0, 1, 0)
-            distanceLabel.TextColor3 = Color3.new(0, 1, 0)
-        end
-    end)
 end
 
--- ฟังก์ชันสำหรับการเปิด/ปิด ESP และอัปเดต Hurtbox ทุก ๆ 60 วินาที
-local function toggleESP()
-    while espEnabled do
-        for _, part in pairs(workspace:GetDescendants()) do
-            if part:IsA("BasePart") and part.Name == "Hurtbox" then
-                if not part:FindFirstChildOfClass("BillboardGui") then
-                    createESPForHurtbox(part)
+-- Vòng update màu + khoảng cách
+RunService.RenderStepped:Connect(function()
+    if not espEnabled then return end
+
+    for _, part in pairs(espParts) do
+        if part and part:FindFirstChild("GEF_ESP") then
+            local gui = part:FindFirstChild("GEF_ESP")
+            local nameLabel = gui:FindFirstChild("NameLabel")
+            local distanceLabel = gui:FindFirstChild("DistanceLabel")
+            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - part.Position).Magnitude
+
+            if nameLabel and distanceLabel then
+                distanceLabel.Text = string.format("Distance: %.1f", distance)
+                if distance < 50 then
+                    nameLabel.TextColor3 = Color3.fromRGB(255, 120, 0)
+                    distanceLabel.TextColor3 = Color3.fromRGB(255, 120, 0)
+                elseif distance < 100 then
+                    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                    distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
+                else
+                    nameLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+                    distanceLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
                 end
             end
         end
-        wait(60) -- รอ 60 วินาทีก่อนที่จะทำการลูปใหม่
     end
-end
+end)
 
--- Tạo Toggle để bật/tắt ESP
+-- Tự động tìm quái GEF mới mỗi 5 giây
+task.spawn(function()
+    while true do
+        if espEnabled then
+            for _, part in pairs(workspace:GetDescendants()) do
+                if part:IsA("BasePart") and part.Name == "Hurtbox" and not part:FindFirstChild("GEF_ESP") then
+                    createESP(part)
+                    table.insert(espParts, part)
+                end
+            end
+        end
+        task.wait(5)
+    end
+end)
+
+-- Toggle để bật/tắt ESP GEF
 local Toggle = GEFTab:CreateToggle({
    Name = "Esp GEF",
    CurrentValue = false,
    Flag = "GEFESP_Toggle", 
    Callback = function(Value)
-        if Value then
-            print("Esp GEF is ON")
-            espEnabled = true -- Bật ESP
-            toggleESP() -- Gọi hàm toggleESP để bắt đầu kiểm tra và tạo ESP
-        else
-            print("Esp GEF is OFF")
-            espEnabled = false -- Tắt ESP
+        espEnabled = Value
+
+        if not Value then
+            for _, part in pairs(espParts) do
+                if part:FindFirstChild("GEF_ESP") then
+                    part:FindFirstChild("GEF_ESP"):Destroy()
+                end
+            end
+            espParts = {}
         end
    end,
 })
