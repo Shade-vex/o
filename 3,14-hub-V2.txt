@@ -344,11 +344,57 @@ local Toggle = PlayerTab:CreateToggle({
 
 
 
+-- Script xử lý Anti GEF
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+local function pushOrDestroyGEF()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Hurtbox" then
+            local gef = obj
+            local distance = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
+
+            if distance <= 999999 then
+                -- Thử đẩy ra xa
+                local success, err = pcall(function()
+                    gef.Velocity = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Unit * 9999999999
+                end)
+
+                -- Nếu không thể đẩy, tiêu diệt GEF
+                if not success then
+                    pcall(function()
+                        gef.Parent:Destroy()
+                    end)
+                end
+            end
+        end
+    end
+end
+
+local AntiGEF_Active = false
+
+-- Tạo nút bật tắt cuối code
+task.delay(0.5, function()
+    local Toggle = PlayerTab:CreateToggle({
+        Name = "Anti GEF",
+        CurrentValue = false,
+        Flag = "GEF_Toggle", 
+        Callback = function(Value)
+            AntiGEF_Active = Value
+        end,
+    })
+
+    RunService.Heartbeat:Connect(function()
+        if AntiGEF_Active then
+            pushOrDestroyGEF()
+        end
+    end)
+end)
 
 
 
-
-local ItemTabWindow:CreateTab("☣Item", nil) 
+local ItemTab = Window:CreateTab("☣Item", nil) 
 local ItemSection = ItemTab:CreateSection("☣Hop Item")
 
 
@@ -540,165 +586,3 @@ local TeleportToShopButton4 = TeleportTab:CreateButton({
         char:PivotTo(targetCFrame)
     end,
 })
-
-
-
-
-local GEFTab = Window:CreateTab("⚛GEF", nil) 
-local GEFSection = GEFTab:CreateSection("⚛GEF")
-
-
--- anti gef
-
--- Script xử lý Anti GEF
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-
-local function pushOrDestroyGEF()
-    for _, obj in pairs(workspace:GetDescendants()) do
-        if obj:IsA("BasePart") and obj.Name == "Hurtbox" then
-            local gef = obj
-            local distance = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
-
-            if distance <= 999999 then
-                -- Thử đẩy ra xa
-                local success, err = pcall(function()
-                    gef.Velocity = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Unit * 9999999999
-                end)
-
-                -- Nếu không thể đẩy, tiêu diệt GEF
-                if not success then
-                    pcall(function()
-                        gef.Parent:Destroy()
-                    end)
-                end
-            end
-        end
-    end
-end
-
-local AntiGEF_Active = false
-
--- Tạo nút bật tắt cuối code
-task.delay(0.5, function()
-    local Toggle = GEFTab:CreateToggle({
-        Name = "Anti GEF",
-        CurrentValue = false,
-        Flag = "GEF_Toggle", 
-        Callback = function(Value)
-            AntiGEF_Active = Value
-        end,
-    })
-
-    RunService.Heartbeat:Connect(function()
-        if AntiGEF_Active then
-            pushOrDestroyGEF()
-        end
-    end)
-end)
-
-
-
-
-
--- esp gef
-
-local Players = game:GetService("Players")
-local RunService = game:GetService("RunService")
-local LocalPlayer = Players.LocalPlayer
-
-local espEnabled = false
-local espParts = {}
-
--- Hàm tạo BillboardGui cho Hurtbox
-local function createESP(part)
-    if part:FindFirstChild("GEF_ESP") then return end
-
-    local espGui = Instance.new("BillboardGui")
-    espGui.Name = "GEF_ESP"
-    espGui.Adornee = part
-    espGui.Size = UDim2.new(0, 200, 0, 50)
-    espGui.AlwaysOnTop = true
-    espGui.StudsOffset = Vector3.new(0, 3, 0)
-    espGui.Parent = part
-
-    local nameLabel = Instance.new("TextLabel", espGui)
-    nameLabel.Name = "NameLabel"
-    nameLabel.Text = "GEF"
-    nameLabel.BackgroundTransparency = 1
-    nameLabel.Size = UDim2.new(0, 200, 0, 20)
-    nameLabel.Font = Enum.Font.SourceSansBold
-    nameLabel.TextSize = 18
-
-    local distanceLabel = Instance.new("TextLabel", espGui)
-    distanceLabel.Name = "DistanceLabel"
-    distanceLabel.BackgroundTransparency = 1
-    distanceLabel.Size = UDim2.new(0, 200, 0, 20)
-    distanceLabel.Position = UDim2.new(0, 0, 0, 20)
-    distanceLabel.Font = Enum.Font.SourceSansBold
-    distanceLabel.TextSize = 18
-end
-
--- Vòng update màu + khoảng cách
-RunService.RenderStepped:Connect(function()
-    if not espEnabled then return end
-
-    for _, part in pairs(espParts) do
-        if part and part:FindFirstChild("GEF_ESP") then
-            local gui = part:FindFirstChild("GEF_ESP")
-            local nameLabel = gui:FindFirstChild("NameLabel")
-            local distanceLabel = gui:FindFirstChild("DistanceLabel")
-            local distance = (LocalPlayer.Character.HumanoidRootPart.Position - part.Position).Magnitude
-
-            if nameLabel and distanceLabel then
-                distanceLabel.Text = string.format("Distance: %.1f", distance)
-                if distance < 50 then
-                    nameLabel.TextColor3 = Color3.fromRGB(255, 120, 0)
-                    distanceLabel.TextColor3 = Color3.fromRGB(255, 120, 0)
-                elseif distance < 100 then
-                    nameLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-                    distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-                else
-                    nameLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-                    distanceLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-                end
-            end
-        end
-    end
-end)
-
--- Tự động tìm quái GEF mới mỗi 5 giây
-task.spawn(function()
-    while true do
-        if espEnabled then
-            for _, part in pairs(workspace:GetDescendants()) do
-                if part:IsA("BasePart") and part.Name == "Hurtbox" and not part:FindFirstChild("GEF_ESP") then
-                    createESP(part)
-                    table.insert(espParts, part)
-                end
-            end
-        end
-        task.wait(5)
-    end
-end)
-
--- Toggle để bật/tắt ESP GEF
-local Toggle = GEFTab:CreateToggle({
-   Name = "Esp GEF",
-   CurrentValue = false,
-   Flag = "GEFESP_Toggle", 
-   Callback = function(Value)
-        espEnabled = Value
-
-        if not Value then
-            for _, part in pairs(espParts) do
-                if part:FindFirstChild("GEF_ESP") then
-                    part:FindFirstChild("GEF_ESP"):Destroy()
-                end
-            end
-            espParts = {}
-        end
-   end,
-})
-
