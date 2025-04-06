@@ -4,7 +4,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
        local Window = MakeWindow({
          Hub = {
          Title = "Maru hub [Premium]",
-         Animation = "By: Kzu123"
+         Animation = "Maru hub [Premium]"
          },
         Key = {
         KeySystem = fasle,
@@ -22,7 +22,7 @@ loadstring(game:HttpGet(("https://raw.githubusercontent.com/Shade-vex/shadevex/r
   })
 
        MinimizeButton({
-       Image = "http://www.roblox.com/asset/?id=102423727586783",
+       Image = "http://www.roblox.com/asset/?id=94454005330615",
        Size = {50, 50},
        Color = Color3.fromRGB(10, 10, 10),
        Corner = true,
