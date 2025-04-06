@@ -36,6 +36,7 @@ local PlayerSection = PlayerTab:CreateSection("✡Player")
 
 
 
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 
@@ -73,18 +74,23 @@ playerDropdown = PlayerTab:CreateDropdown({
     MultipleOptions = false,
     Flag = "dropdownplayer",
     Callback = function(selected)
-        -- Kiểm tra xem player đã chọn có tồn tại trong game không
-        selectedPlayer = Players:FindFirstChild(selected)
-        if selectedPlayer then
-            -- Nếu đã chọn player hợp lệ, thực hiện dịch chuyển ngay lập tức
-            if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
-                print("Dịch chuyển đến: " .. selectedPlayer.Name)
+        -- Kiểm tra xem player đã chọn có tồn tại trong game không và đảm bảo selected không rỗng
+        if selected and selected ~= "" then
+            selectedPlayer = Players:FindFirstChild(selected)
+            if selectedPlayer then
+                -- Nếu đã chọn player hợp lệ, thực hiện dịch chuyển ngay lập tức
+                if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
+                    -- Dịch chuyển đến vị trí của player đó
+                    LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
+                    print("Dịch chuyển đến: " .. selectedPlayer.Name)
+                else
+                    warn("Lỗi: Người chơi không có nhân vật hoặc nhân vật không hợp lệ.")
+                end
             else
-                print("Lỗi: Người chơi không có nhân vật hoặc nhân vật không hợp lệ.")
+                warn("Không tìm thấy player: " .. selected)
             end
         else
-            print("Không tìm thấy player: " .. selected)
+            warn("Vui lòng chọn player hợp lệ từ danh sách.")
         end
     end,
 })
