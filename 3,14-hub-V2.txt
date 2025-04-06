@@ -65,15 +65,6 @@ updatePlayerList()
 Players.PlayerAdded:Connect(updatePlayerList)
 Players.PlayerRemoving:Connect(updatePlayerList)
 
--- Nút cập nhật danh sách người chơi trong Tab7o
-PlayerTab:CreateButton({
-    Name = "Cập nhật danh sách",
-    Callback = function()
-        updatePlayerList() -- Cập nhật danh sách player
-        print("Danh sách player đã được cập nhật.")
-    end,
-})
-
 -- Dropdown danh sách người chơi trong Tab7o
 playerDropdown = PlayerTab:CreateDropdown({
     Name = "Danh sách Player",
@@ -85,28 +76,15 @@ playerDropdown = PlayerTab:CreateDropdown({
         -- Kiểm tra xem player đã chọn có tồn tại trong game không
         selectedPlayer = Players:FindFirstChild(selected)
         if selectedPlayer then
-            print("Đã chọn: " .. selectedPlayer.Name) -- In ra tên người chơi đã chọn
-        else
-            print("Không tìm thấy player: " .. selected)
-        end
-    end,
-})
-
--- Nút dịch chuyển đến người chơi đã chọn trong Tab7o
-PlayerTab:CreateButton({
-    Name = "Dịch chuyển đến",
-    Callback = function()
-        -- Kiểm tra xem đã chọn player chưa và player có nhân vật hợp lệ không
-        if selectedPlayer then
+            -- Nếu đã chọn player hợp lệ, thực hiện dịch chuyển ngay lập tức
             if selectedPlayer.Character and selectedPlayer.Character:FindFirstChild("HumanoidRootPart") then
-                -- Dịch chuyển đến HumanoidRootPart của player
                 LocalPlayer.Character.HumanoidRootPart.CFrame = selectedPlayer.Character.HumanoidRootPart.CFrame
                 print("Dịch chuyển đến: " .. selectedPlayer.Name)
             else
                 print("Lỗi: Người chơi không có nhân vật hoặc nhân vật không hợp lệ.")
             end
         else
-            print("Lỗi: Chưa chọn người chơi trong dropdown.")
+            print("Không tìm thấy player: " .. selected)
         end
     end,
 })
