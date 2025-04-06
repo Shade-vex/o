@@ -41,7 +41,7 @@ local playerNames = {} -- danh sách tên người chơi
 
 -- Nút cập nhật danh sách player
 local UpdatePlayerListButton = PlayerTab:CreateButton({
-    Name = "Cập nhật Player",
+    Name = "Cập nhật",
     Callback = function()
         playerNames = {}
         for _, plr in pairs(Players:GetPlayers()) do
@@ -50,11 +50,16 @@ local UpdatePlayerListButton = PlayerTab:CreateButton({
             end
         end
 
+        -- Nếu không có player khác ngoài bản thân, thông báo
         if #playerNames == 0 then
             table.insert(playerNames, "Không có người chơi nào")
         end
 
         print("Đã cập nhật danh sách người chơi!")
+        print("Danh sách player: ", table.concat(playerNames, ", "))
+        
+        -- Cập nhật lại Dropdown
+        PlayerDropdown:SetOptions(playerNames)
     end,
 })
 
