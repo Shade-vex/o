@@ -62,4 +62,84 @@ local MedkitButton = ItemTab:CreateButton({
     end,
 })
 
+local BatButton = ItemTab:CreateButton({
+    Name = "Bat",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Bat.CFrame
+        print("Teleported to Bat!")
+    end,
+})
+
+local CrowbarButton = ItemTab:CreateButton({
+    Name = "Crowbar",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Crowbar.CFrame
+        print("Teleported to Crowbar!")
+    end,
+})
+
+local HandgunButton = ItemTab:CreateButton({
+    Name = "Handgun",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Handgun.CFrame
+        print("Teleported to Handgun!")
+    end,
+})
+
+local ShotgunButton = ItemTab:CreateButton({
+    Name = "Shotgun",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Shotgun.CFrame
+        print("Teleported to Shotgun!")
+    end,
+})
+
+local ShellsButton = ItemTab:CreateButton({
+    Name = "Shells",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Shells.CFrame
+        print("Teleported to Shells!")
+    end,
+})
+
+local HammerButton = ItemTab:CreateButton({
+    Name = "Hammer",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Hammer.CFrame
+        print("Teleported to Hammer!")
+    end,
+})
+
+local LanternButton = ItemTab:CreateButton({
+    Name = "Lantern",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Lantern.CFrame
+        print("Teleported to Lantern!")
+    end,
+})
+
+local GPSButton = ItemTab:CreateButton({
+    Name = "GPS",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.GPS.CFrame
+        print("Teleported to GPS!")
+    end,
+})
+
+local MoneyButton = ItemTab:CreateButton({
+    Name = "Money",
+    Callback = function()
+        local rootPart = game.Players.LocalPlayer.Character.HumanoidRootPart
+        rootPart.CFrame = game:GetService("Workspace").Pickups.Money.CFrame
+        print("Teleported to Money!")
+    end,
+})
 
