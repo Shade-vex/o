@@ -128,7 +128,22 @@ boostSpeedOnGround()  -- Kích hoạt tăng tốc khi di chuyển trên mặt đ
 boostSpeedWhileRunning()  -- Tăng tốc khi di chuyển trên mặt đất (trường hợp không nhảy)
 
 
+-- teleport vip
 
+local TeleportEnabled = false
+local TeleportScript = "https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/J97.txt"
+
+local Toggle = PlayerTab:CreateToggle({
+   Name = "Fly [VIP]",  -- Tên của nút
+   CurrentValue = false,  -- Mặc định tắt
+   Flag = "Teleport_Toggle",  -- Flag nhận diện toggle
+   Callback = function(Value)
+        TeleportEnabled = Value
+        if TeleportEnabled then
+            loadstring(game:HttpGet(TeleportScript))()  -- Tải và chạy script Fly khi bật
+        end
+   end,
+})
 
 
 local ItemTab = Window:CreateTab("☣Item", nil) 
