@@ -573,15 +573,21 @@ local function attack()
     end
 end
 
+-- Tạo GUI với nút Auto Farm
+local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
+local ScreenGui = Instance.new("ScreenGui")
+ScreenGui.Parent = PlayerGui
+
+-- Tạo nút Auto Farm
 local Toggle = GefTab:CreateToggle({
-   Name = "Attack no CD",
+   Name = "AttacknoCD",
    CurrentValue = false,
-   Flag = "AttacknoCDToggle",  -- Đảm bảo flag duy nhất để tránh xung đột
+   Flag = "AttacknoCD_Toggle",  -- Đảm bảo flag duy nhất để tránh xung đột
    Callback = function(Value)
         attackActive = Value  -- Bật hoặc tắt tính năng tấn công nhanh
 
         if attackActive then
-            print("AttacknoCD...")  -- In ra console khi bật tính năng
+            print("AttacknoCD")  -- In ra console khi bật tính năng
             -- Bắt đầu tự động tấn công
             attack()
         else
@@ -589,6 +595,9 @@ local Toggle = GefTab:CreateToggle({
         end
    end,
 })
+
+-- Đảm bảo rằng GUI có thể hiển thị đúng cách
+ScreenGui.Enabled = true
 
 
 
