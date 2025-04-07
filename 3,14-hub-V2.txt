@@ -698,58 +698,46 @@ GefTab:CreateToggle({
 
 
 
-local Players = game:GetService("Players")
+-- Script xử lý Kill GEF
 local RunService = game:GetService("RunService")
-local TweenService = game:GetService("TweenService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
 
-local player = Players.LocalPlayer
-local toggle = false
+local function destroyGEF()
+    for _, obj in pairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Hurtbox" then
+            local gef = obj
+            local distance = (gef.Position - LocalPlayer.Character.HumanoidRootPart.Position).Magnitude
 
--- Âm thanh hét kinh dị (bạn có thể thay SoundId nếu muốn âm khác)
-local screamSoundId = "rbxassetid://9118823103" -- tiếng hét nữ rợn người
-
-function killGEF(gefModel)
-    -- Phát âm thanh hét
-    local scream = Instance.new("Sound")
-    scream.SoundId = screamSoundId
-    scream.Volume = 10
-    scream.Parent = gefModel:FindFirstChild("Hurtbox") or gefModel
-    scream:Play()
-
-    -- Hiệu ứng rung (giật)
-    local hurtbox = gefModel:FindFirstChild("Hurtbox")
-    if hurtbox then
-        for i = 1, 5 do
-            local offset = Vector3.new(math.random(-2,2), math.random(-2,2), math.random(-2,2))
-            hurtbox.CFrame = hurtbox.CFrame * CFrame.new(offset)
-            task.wait(0.05)
-        end
-    end
-
-    -- Xóa sạch GEF
-    gefModel:Destroy()
-end
-
--- Lặp kiểm tra GEF và tiêu diệt mỗi 0.5s
-task.spawn(function()
-    while true do
-        task.wait(0.5)
-        if toggle then
-            for _, gef in pairs(workspace:GetDescendants()) do
-                if gef:IsA("Model") and gef:FindFirstChild("Hurtbox") then
-                    killGEF(gef)
-                end
+            if distance <= 999999 then
+                -- Tiêu diệt GEF ngay lập tức khi phát hiện
+                pcall(function()
+                    if gef.Parent then
+                        gef.Parent:Destroy()
+                    end
+                end)
             end
         end
     end
-end)
+end
 
--- Nút toggle trong tab PlayerTab
-local KillGEFToggle = GefTab:CreateToggle({
-    Name = "Kill GEF V2",
-    CurrentValue = false,
-    Flag = "KillGEF V2",
-    Callback = function(Value)
-        toggle = Value
-    end,
-})
+local KillGEF_Active = false
+
+-- Tạo nút bật tắt cuối code
+task.delay(0.5, function()
+    local Toggle = GefTab:CreateToggle({
+        Name = "Kill GEF V2",
+        CurrentValue = false,
+        Flag = "KillGEF_Toggle", 
+        Callback = function(Value)
+            KillGEF_Active = Value
+        end,
+    })
+
+    RunService.Heartbeat:Connect(function()
+        if KillGEF_Active then
+            -- Tiêu diệt GEF ngay lập tức khi bật Anti GEF
+            destroyGEF()
+        end
+    end)
+end)
