@@ -556,7 +556,20 @@ local TeleportToHouseButton1 = TeleportTab:CreateButton({
     end,
 })
 
+local TeleportToHouseButton2 = TeleportTab:CreateButton({
+    Name = "Đến nhà 2",
+    Callback = function()
+        local player = game.Players.LocalPlayer
+        local char = player.Character or player.CharacterAdded:Wait()
+        local hrp = char:WaitForChild("HumanoidRootPart")
 
+        -- Thay đổi tọa độ bạn muốn đến ở đây:
+        local targetCFrame = CFrame.new(0.1, 4.0, -286.3)
+
+        -- Dịch chuyển đến tọa độ
+        char:PivotTo(targetCFrame)
+    end,
+})
 
 local GefTab = Window:CreateTab("☯GEF", nil) 
 local GefSection = GefTab:CreateSection("☯GEF")
