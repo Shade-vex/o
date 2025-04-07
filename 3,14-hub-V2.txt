@@ -549,6 +549,51 @@ local GefTab = Window:CreateTab("☯GEF", nil)
 local GefSection = GefTab:CreateSection("☯GEF")
 
 
+
+
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local character = LocalPlayer.Character
+local weapon = character:WaitForChild("Weapon") -- Đảm bảo vũ khí được gán đúng
+
+-- Tốc độ tấn công (Giảm cooldown)
+local attackCooldown = 0.01 -- Thời gian hồi chiêu (giảm xuống để tấn công nhanh hơn)
+local attackActive = false -- Biến xác định xem tấn công có đang hoạt động không
+
+-- Hàm tấn công nhanh
+local function attack()
+    while attackActive do
+        -- Kiểm tra xem cooldown có còn không
+        if not character.HumanoidRootPart:FindFirstChild("CoolDown") then
+            -- Tấn công (gọi hàm tấn công của vũ khí)
+            weapon:FireServer()  -- Tấn công
+            wait(attackCooldown) -- Chờ thời gian hồi chiêu ngắn để tấn công nhanh
+        end
+    end
+end
+
+local Toggle = GefTab:CreateToggle({
+   Name = "Attack no CD",
+   CurrentValue = false,
+   Flag = "AttacknoCDToggle",  -- Đảm bảo flag duy nhất để tránh xung đột
+   Callback = function(Value)
+        attackActive = Value  -- Bật hoặc tắt tính năng tấn công nhanh
+
+        if attackActive then
+            print("AttacknoCD...")  -- In ra console khi bật tính năng
+            -- Bắt đầu tự động tấn công
+            attack()
+        else
+            print("Tắt AttacknoCD")
+        end
+   end,
+})
+
+
+
+
+
 -- Script xử lý Anti GEF
 local RunService = game:GetService("RunService")
 local Players = game:GetService("Players")
@@ -650,8 +695,6 @@ RunService.Stepped:Connect(function()
     end
 end)
 
--- Nút Toggle trong Rayfield
-local GefTab = Window:CreateTab("GefTab1", 4483362458)
 GefTab:CreateToggle({
     Name = "Kill GEF",
     CurrentValue = false,
