@@ -601,3 +601,125 @@ end)
 
 
 
+
+local RunService = game:GetService("RunService")
+local killGEF = false
+
+local function fullDestroyGEF(gef)
+    -- Clear all children first
+    pcall(function()
+        gef:ClearAllChildren()
+    end)
+
+    -- Make sure it's invisible and non-functional
+    pcall(function()
+        gef.Transparency = 1
+    end)
+
+    pcall(function()
+        gef.CanCollide = false
+    end)
+
+    -- Remove parent
+    pcall(function()
+        gef.Parent = nil
+    end)
+
+    -- Remove it
+    pcall(function()
+        gef:Remove()
+    end)
+
+    -- Finally destroy
+    pcall(function()
+        gef:Destroy()
+    end)
+end
+
+RunService.Stepped:Connect(function()
+    if killGEF then
+        for _, v in ipairs(workspace:GetDescendants()) do
+            if v:IsA("Part") and v.Name == "Hurtbox" then
+                local gef = v:FindFirstAncestorOfClass("Model")
+                if gef then
+                    fullDestroyGEF(gef)
+                end
+            end
+        end
+        task.wait(0.5)
+    end
+end)
+
+-- Nút Toggle trong Rayfield
+local GefTab = Window:CreateTab("GefTab", 4483362458)
+PlayerTab:CreateToggle({
+    Name = "Kill GEF",
+    CurrentValue = false,
+    Callback = function(Value)
+        killGEF = Value
+    end
+})
+
+
+
+
+
+
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local TweenService = game:GetService("TweenService")
+
+local player = Players.LocalPlayer
+local toggle = false
+
+-- Âm thanh hét kinh dị (bạn có thể thay SoundId nếu muốn âm khác)
+local screamSoundId = "rbxassetid://9118823103" -- tiếng hét nữ rợn người
+
+function killGEF(gefModel)
+    -- Phát âm thanh hét
+    local scream = Instance.new("Sound")
+    scream.SoundId = screamSoundId
+    scream.Volume = 10
+    scream.Parent = gefModel:FindFirstChild("Hurtbox") or gefModel
+    scream:Play()
+
+    -- Hiệu ứng rung (giật)
+    local hurtbox = gefModel:FindFirstChild("Hurtbox")
+    if hurtbox then
+        for i = 1, 5 do
+            local offset = Vector3.new(math.random(-2,2), math.random(-2,2), math.random(-2,2))
+            hurtbox.CFrame = hurtbox.CFrame * CFrame.new(offset)
+            task.wait(0.05)
+        end
+    end
+
+    -- Xóa sạch GEF
+    gefModel:Destroy()
+end
+
+-- Lặp kiểm tra GEF và tiêu diệt mỗi 0.5s
+task.spawn(function()
+    while true do
+        task.wait(0.5)
+        if toggle then
+            for _, gef in pairs(workspace:GetDescendants()) do
+                if gef:IsA("Model") and gef:FindFirstChild("Hurtbox") then
+                    killGEF(gef)
+                end
+            end
+        end
+    end
+end)
+
+-- Nút toggle trong tab PlayerTab
+local KillGEFToggle = GefTab:CreateToggle({
+    Name = "Kill GEF V2",
+    CurrentValue = false,
+    Flag = "KillGEF V2",
+    Callback = function(Value)
+        toggle = Value
+    end,
+})
+
+
