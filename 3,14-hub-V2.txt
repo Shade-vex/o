@@ -651,8 +651,8 @@ RunService.Stepped:Connect(function()
 end)
 
 -- Nút Toggle trong Rayfield
-local GefTab = Window:CreateTab("GefTab", 4483362458)
-PlayerTab:CreateToggle({
+local GefTab = Window:CreateTab("GefTab1", 4483362458)
+GefTab:CreateToggle({
     Name = "Kill GEF",
     CurrentValue = false,
     Callback = function(Value)
@@ -721,5 +721,7 @@ local KillGEFToggle = GefTab:CreateToggle({
         toggle = Value
     end,
 })
+
+
 
 
