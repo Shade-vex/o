@@ -551,53 +551,7 @@ local GefSection = GefTab:CreateSection("☯GEF")
 
 
 
-local RunService = game:GetService("RunService")
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local character = LocalPlayer.Character
-local weapon = character:WaitForChild("Weapon") -- Đảm bảo vũ khí được gán đúng
 
--- Tốc độ tấn công (Giảm cooldown)
-local attackCooldown = 0.01 -- Thời gian hồi chiêu (giảm xuống để tấn công nhanh hơn)
-local attackActive = false -- Biến xác định xem tấn công có đang hoạt động không
-
--- Hàm tấn công nhanh
-local function attack()
-    while attackActive do
-        -- Kiểm tra xem cooldown có còn không
-        if not character.HumanoidRootPart:FindFirstChild("CoolDown") then
-            -- Tấn công (gọi hàm tấn công của vũ khí)
-            weapon:FireServer()  -- Tấn công
-            wait(attackCooldown) -- Chờ thời gian hồi chiêu ngắn để tấn công nhanh
-        end
-    end
-end
-
--- Tạo GUI với nút Auto Farm
-local PlayerGui = LocalPlayer:WaitForChild("PlayerGui")
-local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Parent = PlayerGui
-
--- Tạo nút Auto Farm
-local Toggle = GefTab:CreateToggle({
-   Name = "AttacknoCD",
-   CurrentValue = false,
-   Flag = "AttacknoCD_Toggle",  -- Đảm bảo flag duy nhất để tránh xung đột
-   Callback = function(Value)
-        attackActive = Value  -- Bật hoặc tắt tính năng tấn công nhanh
-
-        if attackActive then
-            print("AttacknoCD")  -- In ra console khi bật tính năng
-            -- Bắt đầu tự động tấn công
-            attack()
-        else
-            print("Tắt AttacknoCD")
-        end
-   end,
-})
-
--- Đảm bảo rằng GUI có thể hiển thị đúng cách
-ScreenGui.Enabled = true
 
 
 
@@ -773,7 +727,3 @@ local KillGEFToggle = GefTab:CreateToggle({
         toggle = Value
     end,
 })
-
-
-
-
