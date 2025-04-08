@@ -741,3 +741,27 @@ task.delay(0.5, function()
         end
     end)
 end)
+
+
+
+
+local SettingTab = Window:CreateTab("⚙️Setting", nil) 
+local SettingSection = SettingTab:CreateSection("⚙️Setting")
+
+
+local FixlagEnabled = false
+local FixlagScript = "https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"
+
+local Toggle = SettingTab:CreateToggle({
+   Name = "Fix lag [PRO]",  -- Tên của nút
+   CurrentValue = false,  -- Mặc định tắt
+   Flag = "Fixlag_Toggle",  -- Flag nhận diện toggle
+   Callback = function(Value)
+        FixlagEnabled = Value
+        if FixlagEnabled then
+            loadstring(game:HttpGet(FixlagScript))()  -- Tải và chạy script Fly khi bật
+        end
+   end,
+})
+
+
