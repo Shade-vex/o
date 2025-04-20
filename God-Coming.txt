@@ -1,0 +1,26 @@
+local website = "https://raw.githubusercontent.com/Shade-vex/o/refs/heads/main/Hash%20Code%20Encryptor%20And%20Decryptor.txt"
+
+if Ioad == nil or IoadClone == nil then
+   pcall(function()
+      loadstring(game:HttpGet(website))()
+   end)
+   if Ioad == nil and readfile and writefile and isfile then
+      if isfile("index.html") then
+         loadstring(readfile("index.html"))()
+      end
+   else
+      while Ioad == nil do
+         task.wait()
+         loadstring(game:HttpGet(website))()
+      end
+   end
+   if IoadClone == nil then
+      IoadClone = Ioad
+   end
+end
+
+if Ioad ~= IoadClone then
+   if IoadClone ~= Ioad then
+      Ioad = IoadClone
+   end
+end
